@@ -5,6 +5,7 @@ import { MessagingModule } from '@app/messaging';
 import { MonitoringModule } from '@app/monitoring';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CourseController } from './controllers/course.controller';
 import { CourseService } from './services/course.service';
@@ -17,6 +18,7 @@ import { CourseService } from './services/course.service';
         limit: 100,
       },
     ]),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
     LoggingModule,
     MonitoringModule,

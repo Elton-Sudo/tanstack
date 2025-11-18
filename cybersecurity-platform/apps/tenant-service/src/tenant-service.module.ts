@@ -6,6 +6,7 @@ import { MonitoringModule } from '@app/monitoring';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TenantController } from './controllers/tenant.controller';
@@ -24,6 +25,7 @@ import { TenantService } from './services/tenant.service';
         limit: 100,
       },
     ]),
+    EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     DatabaseModule,
     LoggingModule,
