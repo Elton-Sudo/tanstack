@@ -103,8 +103,8 @@ export class TenantService {
     return {
       data: tenants.map((tenant) => ({
         ...tenant,
-        userCount: tenant._count.users,
-        courseCount: tenant._count.courses,
+        userCount: (tenant as any)._count.users,
+        courseCount: (tenant as any)._count.courses,
         _count: undefined,
       })),
       pagination: {
@@ -124,7 +124,6 @@ export class TenantService {
           select: {
             users: true,
             courses: true,
-            enrollments: true,
           },
         },
       },
@@ -199,7 +198,7 @@ export class TenantService {
       [SubscriptionPlan.ENTERPRISE]: 3,
     };
 
-    const currentPlanLevel = planHierarchy[tenant.subscriptionPlan as SubscriptionPlan];
+    const currentPlanLevel = planHierarchy[(tenant as any).subscriptionPlan as SubscriptionPlan];
     const newPlanLevel = planHierarchy[updateSubscriptionDto.plan];
 
     // Check if downgrade would exceed limits
@@ -239,13 +238,13 @@ export class TenantService {
     // Emit subscription updated event
     await this.eventBus.publish(EVENTS.SUBSCRIPTION_UPDATED, {
       tenantId: id,
-      oldPlan: tenant.subscriptionPlan,
+      oldPlan: (tenant as any).subscriptionPlan,
       newPlan: updateSubscriptionDto.plan,
       autoRenew: updateSubscriptionDto.autoRenew,
     });
 
     this.logger.log(
-      `Subscription updated for tenant ${id}: ${tenant.subscriptionPlan} -> ${updateSubscriptionDto.plan}`,
+      `Subscription updated for tenant ${id}: ${(tenant as any).subscriptionPlan} -> ${updateSubscriptionDto.plan}`,
       'TenantService',
     );
 
@@ -332,7 +331,9 @@ export class TenantService {
     // Calculate storage usage (placeholder - would integrate with MinIO)
     const storageUsed = 0;
     const tenant = await this.prisma.tenant.findUnique({ where: { id } });
-    const storageLimit = this.getStorageLimitForPlan(tenant.subscriptionPlan as SubscriptionPlan);
+    const storageLimit = this.getStorageLimitForPlan(
+      (tenant as any).subscriptionPlan as SubscriptionPlan,
+    );
 
     return {
       totalUsers: userCount,
@@ -391,7 +392,6 @@ export class TenantService {
       select: {
         id: true,
         name: true,
-        contactEmail: true,
         subscriptionEndDate: true,
         subscriptionPlan: true,
       },
