@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ChangePasswordDto, LoginDto, RegisterDto } from '../dto/auth.dto';
+import { MfaService } from './mfa.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly logger: LoggerService,
+    private readonly mfaService: MfaService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -76,13 +78,29 @@ export class AuthService {
         where: { id: user.id },
         data: {
           failedAttempts: user.failedAttempts + 1,
-          lockedUntil: user.failedAttempts + 1 >= 5
-            ? new Date(Date.now() + 15 * 60 * 1000) // Lock for 15 minutes
-            : null,
+          lockedUntil:
+            user.failedAttempts + 1 >= 5
+              ? new Date(Date.now() + 15 * 60 * 1000) // Lock for 15 minutes
+              : null,
         },
       });
 
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Check if MFA is enabled
+    if (user.mfaEnabled) {
+      // Return partial token requiring MFA verification
+      const partialToken = this.jwtService.sign(
+        { userId: user.id, mfaRequired: true },
+        { expiresIn: '5m', secret: this.configService.get('JWT_SECRET') },
+      );
+
+      return {
+        mfaRequired: true,
+        partialToken,
+        message: 'MFA verification required',
+      };
     }
 
     // Reset failed attempts and update last login
@@ -230,6 +248,76 @@ export class AuthService {
     this.logger.log(`Password changed for user: ${userId}`, 'AuthService');
 
     return { message: 'Password changed successfully' };
+  }
+
+  async verifyMfaLogin(partialToken: string, mfaCode: string) {
+    try {
+      // Verify partial token
+      const payload = this.jwtService.verify(partialToken, {
+        secret: this.configService.get('JWT_SECRET'),
+      });
+
+      if (!payload.mfaRequired) {
+        throw new UnauthorizedException('Invalid token');
+      }
+
+      // Verify MFA code
+      const isValid = await this.mfaService.verifyMfaCode(payload.userId, mfaCode);
+
+      if (!isValid) {
+        throw new UnauthorizedException('Invalid MFA code');
+      }
+
+      // Get user
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.userId },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      // Reset failed attempts and update last login
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          failedAttempts: 0,
+          lockedUntil: null,
+          lastLoginAt: new Date(),
+        },
+      });
+
+      // Generate tokens
+      const tokens = await this.generateTokens(user);
+
+      // Create session
+      await this.prisma.session.create({
+        data: {
+          userId: user.id,
+          token: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+          ipAddress: 'unknown', // Should get from request
+          userAgent: 'unknown', // Should get from request
+        },
+      });
+
+      this.logger.log(`User completed MFA login: ${user.email}`, 'AuthService');
+
+      return {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        },
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 
   private async generateTokens(user: any) {

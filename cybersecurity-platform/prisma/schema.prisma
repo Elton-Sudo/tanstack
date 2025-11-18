@@ -182,23 +182,29 @@ model AuditLog {
 // ============================================
 
 model Tenant {
-    id             String       @id @default(uuid())
-    name           String
-    slug           String       @unique
-    domain         String?      @unique
-    status         TenantStatus @default(TRIAL)
-    logo           String?
-    primaryColor   String?      @default("#3B82F6")
-    secondaryColor String?      @default("#1E40AF")
-    favicon        String?
-    subscriptionId String?
-    planType       String?      @default("FREE")
-    maxUsers       Int          @default(100)
-    features       Json? // Feature flags
-    settings       Json? // Custom settings
-    trialEndsAt    DateTime?
-    createdAt      DateTime     @default(now())
-    updatedAt      DateTime     @updatedAt
+    id                    String       @id @default(uuid())
+    name                  String
+    slug                  String       @unique
+    description           String?
+    domain                String?      @unique
+    website               String?
+    contactEmail          String?
+    contactPhone          String?
+    status                TenantStatus @default(TRIAL)
+    logo                  String?
+    primaryColor          String?      @default("#3B82F6")
+    secondaryColor        String?      @default("#1E40AF")
+    favicon               String?
+    subscriptionId        String?
+    subscriptionPlan      String?      @default("TRIAL")
+    maxUsers              Int          @default(10)
+    subscriptionStartDate DateTime?
+    subscriptionEndDate   DateTime?
+    features              Json? // Feature flags
+    settings              Json? // Custom settings
+    trialEndsAt           DateTime?
+    createdAt             DateTime     @default(now())
+    updatedAt             DateTime     @updatedAt
 
     // Relations
     users         User[]
@@ -207,6 +213,7 @@ model Tenant {
 
     @@index([slug])
     @@index([status])
+    @@index([subscriptionEndDate])
 }
 
 // ============================================

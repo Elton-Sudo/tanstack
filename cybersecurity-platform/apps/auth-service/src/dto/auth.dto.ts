@@ -54,3 +54,13 @@ export class ChangePasswordDto {
   @MinLength(8)
   newPassword: string;
 }
+
+export class VerifyMfaLoginDto {
+  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
+  @IsString()
+  partialToken: string;
+
+  @ApiProperty({ example: '123456' })
+  @IsString()
+  code: string;
+}

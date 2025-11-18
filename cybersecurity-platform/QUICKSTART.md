@@ -1,6 +1,7 @@
 # Quick Start Guide
 
 ## Prerequisites Checklist
+
 - ✅ Node.js >= 18.0.0
 - ✅ Docker & Docker Compose
 - ✅ PostgreSQL 15+ (via Docker)
@@ -9,6 +10,7 @@
 ## Installation Steps
 
 ### 1. Clone and Setup
+
 ```bash
 cd cybersecurity-platform
 chmod +x setup.sh
@@ -16,6 +18,7 @@ chmod +x setup.sh
 ```
 
 The setup script will:
+
 - Install all dependencies
 - Start infrastructure services (PostgreSQL, Redis, RabbitMQ, MinIO)
 - Generate Prisma Client
@@ -23,6 +26,7 @@ The setup script will:
 - Seed the database with test data
 
 ### 2. Start Development Server
+
 ```bash
 npm run start:dev
 ```
@@ -30,10 +34,12 @@ npm run start:dev
 ### 3. Access the Application
 
 **Auth Service:**
+
 - API: http://localhost:3001/api/v1
 - Swagger Documentation: http://localhost:3001/api/docs
 
 **Infrastructure:**
+
 - PostgreSQL: `localhost:5432`
 - Redis: `localhost:6379`
 - RabbitMQ Management: http://localhost:15672 (guest/guest)
@@ -46,6 +52,7 @@ npm run start:dev
 ## Test the API
 
 ### 1. Login
+
 ```bash
 curl -X POST http://localhost:3001/api/v1/auth/login \
   -H "Content-Type: application/json" \
@@ -57,6 +64,7 @@ curl -X POST http://localhost:3001/api/v1/auth/login \
 ```
 
 ### 2. Get User Profile (with token)
+
 ```bash
 curl -X GET http://localhost:3001/api/v1/auth/me \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
@@ -64,26 +72,29 @@ curl -X GET http://localhost:3001/api/v1/auth/me \
 
 ## Default Credentials (After Seeding)
 
-| Role | Email | Password |
-|------|-------|----------|
-| Super Admin | superadmin@platform.com | Password123! |
-| Tenant Admin | admin@acme.com | Password123! |
-| Manager | manager@acme.com | Password123! |
-| User | user1@acme.com | Password123! |
+| Role         | Email                   | Password     |
+| ------------ | ----------------------- | ------------ |
+| Super Admin  | superadmin@platform.com | Password123! |
+| Tenant Admin | admin@acme.com          | Password123! |
+| Manager      | manager@acme.com        | Password123! |
+| User         | user1@acme.com          | Password123! |
 
 ## Database Management
 
 ### View Data
+
 ```bash
 npm run prisma:studio
 ```
 
 ### Run Migrations
+
 ```bash
 npm run prisma:migrate
 ```
 
 ### Reset Database
+
 ```bash
 npx prisma migrate reset
 ```
@@ -119,6 +130,7 @@ npm run docker:clean
 ## Troubleshooting
 
 ### Port Already in Use
+
 ```bash
 # Check what's using the port
 lsof -i :3001
@@ -127,6 +139,7 @@ lsof -i :3001
 ```
 
 ### Database Connection Issues
+
 ```bash
 # Restart PostgreSQL container
 docker-compose restart postgres
@@ -136,6 +149,7 @@ docker-compose logs postgres
 ```
 
 ### Clear Everything and Start Fresh
+
 ```bash
 npm run docker:clean
 rm -rf node_modules
@@ -146,9 +160,55 @@ npm install
 
 ## Next Steps
 
-1. ✅ **Phase 1 Complete** - Infrastructure is ready
-2. 🔜 **Phase 2** - Implement remaining microservices
-3. 🔜 **Phase 3** - Add authentication features (MFA, SSO)
+1. ✅ **Phase 1 Complete** - Infrastructure and basic auth service ready
+2. ✅ **Phase 2 Complete** - Auth Service with MFA, SSO, password management, sessions, and audit logging
+3. 🔜 **Phase 3** - Complete Tenant Service
+4. 🔜 **Phase 4** - Complete User Service
+
+### Phase 2 Features Available
+
+**Multi-Factor Authentication (MFA):**
+
+- TOTP-based authentication using authenticator apps
+- QR code generation for easy setup
+- Backup codes for account recovery
+- `/api/v1/auth/mfa/setup` - Initiate MFA setup
+- `/api/v1/auth/mfa/verify` - Verify and enable MFA
+- `/api/v1/auth/login/mfa` - Complete MFA login
+
+**Password Management:**
+
+- Forgot password flow with email verification
+- Password strength validation with scoring
+- Secure password reset with time-limited tokens
+- `/api/v1/auth/password/forgot` - Request password reset
+- `/api/v1/auth/password/reset` - Reset password with token
+- `/api/v1/auth/password/validate` - Check password strength
+
+**Session Management:**
+
+- View all active sessions
+- Device and browser tracking
+- Revoke individual or all sessions
+- `/api/v1/auth/sessions` - List user sessions
+- `/api/v1/auth/sessions/:id` - Revoke specific session
+
+**Audit Logging:**
+
+- Login history with pagination
+- Security event tracking
+- Device authorization management
+- `/api/v1/auth/audit/login-history` - View login attempts
+- `/api/v1/auth/audit/security-events` - View security events
+
+**Single Sign-On (SSO):**
+
+- OAuth 2.0 (Google, Microsoft, GitHub)
+- SAML 2.0 support (enterprise IdP integration)
+- Auto-provisioning of SSO users
+- `/api/v1/auth/sso/oauth/initiate` - Start OAuth flow
+- `/api/v1/auth/sso/saml/initiate` - Start SAML flow
+
 4. 🔜 **Phase 4** - Implement course management
 5. 🔜 **Phase 5** - Build analytics and reporting
 
@@ -208,6 +268,7 @@ cybersecurity-platform/
 ## Features Implemented
 
 ### ✅ Phase 1 - Infrastructure
+
 - [x] NestJS monorepo setup
 - [x] Docker Compose for infrastructure
 - [x] PostgreSQL database
@@ -222,6 +283,7 @@ cybersecurity-platform/
 - [x] Database seeding
 
 ### ✅ Shared Libraries
+
 - [x] @app/common - DTOs, decorators, filters, interceptors
 - [x] @app/auth - JWT guards, RBAC
 - [x] @app/database - Prisma client
@@ -230,6 +292,7 @@ cybersecurity-platform/
 - [x] @app/messaging - Event bus
 
 ### ✅ Auth Service (Partial)
+
 - [x] User registration
 - [x] Login/logout
 - [x] JWT tokens
@@ -245,6 +308,7 @@ cybersecurity-platform/
 ## Support
 
 For issues or questions:
+
 1. Check the logs: `docker-compose logs`
 2. Review the documentation in `/docs`
 3. Open an issue on GitHub

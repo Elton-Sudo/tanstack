@@ -1,7 +1,13 @@
 import { CurrentUser, Public } from '@app/common';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ChangePasswordDto, LoginDto, RefreshTokenDto, RegisterDto } from '../dto/auth.dto';
+import {
+  ChangePasswordDto,
+  LoginDto,
+  RefreshTokenDto,
+  RegisterDto,
+  VerifyMfaLoginDto,
+} from '../dto/auth.dto';
 import { AuthService } from '../services/auth.service';
 
 @ApiTags('auth')
@@ -24,6 +30,15 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login successful' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('login/mfa')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Complete MFA login' })
+  @ApiResponse({ status: 200, description: 'MFA verification successful' })
+  async verifyMfaLogin(@Body() verifyMfaLoginDto: VerifyMfaLoginDto) {
+    return this.authService.verifyMfaLogin(verifyMfaLoginDto.partialToken, verifyMfaLoginDto.code);
   }
 
   @Post('logout')

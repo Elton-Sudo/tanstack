@@ -6,10 +6,10 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as compression from 'compression';
 import helmet from 'helmet';
-import { AuthServiceModule } from './auth-service.module';
+import { TenantServiceModule } from './tenant-service.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AuthServiceModule, {
+  const app = await NestFactory.create(TenantServiceModule, {
     bufferLogs: true,
   });
 
@@ -46,19 +46,19 @@ async function bootstrap() {
 
   // Swagger documentation
   const config = new DocumentBuilder()
-    .setTitle('Auth Service API')
-    .setDescription('Authentication & Authorization Service')
+    .setTitle('Tenant Service API')
+    .setDescription('Multi-tenant management service')
     .setVersion('1.0')
     .addBearerAuth()
-    .addTag('auth')
+    .addTag('tenants')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = configService.get('AUTH_SERVICE_PORT', 3001);
+  const port = configService.get('TENANT_SERVICE_PORT', 3002);
   await app.listen(port);
 
-  logger.log(`🚀 Auth Service is running on: http://localhost:${port}`);
+  logger.log(`🚀 Tenant Service is running on: http://localhost:${port}`);
   logger.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
 }
 
