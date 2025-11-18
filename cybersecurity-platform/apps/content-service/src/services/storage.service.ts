@@ -25,7 +25,6 @@ export class StorageService {
     private readonly config: ConfigService,
     private readonly logger: LoggerService,
   ) {
-    this.logger.setContext('StorageService');
     this.bucket = this.config.get('S3_BUCKET') || 'cybersec-content';
     this.cdnUrl = this.config.get('CDN_URL') || '';
     this.useLocalStorage = this.config.get('USE_LOCAL_STORAGE') === 'true';
@@ -73,7 +72,7 @@ export class StorageService {
   private async uploadToLocal(
     buffer: Buffer,
     key: string,
-    mimeType: string,
+    _mimeType: string,
   ): Promise<{ url: string; cdnUrl?: string; key: string }> {
     const filePath = path.join(this.localStoragePath, key);
     const dir = path.dirname(filePath);
@@ -120,9 +119,9 @@ export class StorageService {
    * Initialize multipart upload
    */
   async initializeMultipartUpload(
-    filename: string,
-    mimeType: string,
-    tenantId: string,
+    _filename: string,
+    _mimeType: string,
+    _tenantId: string,
   ): Promise<string> {
     const uploadId = randomUUID();
     this.logger.log(`Multipart upload initialized: ${uploadId}`);
@@ -135,7 +134,7 @@ export class StorageService {
   async uploadPart(
     uploadId: string,
     partNumber: number,
-    buffer: Buffer,
+    _buffer: Buffer,
   ): Promise<{ etag: string; uploadUrl: string }> {
     const etag = randomUUID();
     const uploadUrl = `pending/${uploadId}/${partNumber}`;
@@ -150,7 +149,7 @@ export class StorageService {
    */
   async completeMultipartUpload(
     uploadId: string,
-    parts: string[],
+    _parts: string[],
   ): Promise<{ url: string; cdnUrl?: string; key: string }> {
     const key = `uploads/${uploadId}`;
     const url = this.useLocalStorage
@@ -248,8 +247,8 @@ export class StorageService {
   async transcodeVideo(
     key: string,
     qualities: VideoQuality[],
-    generateHls: boolean,
-    generateDash: boolean,
+    _generateHls: boolean,
+    _generateDash: boolean,
   ): Promise<string> {
     const jobId = randomUUID();
     this.logger.log(`Transcoding video: ${key} to qualities: ${qualities.join(', ')}`);

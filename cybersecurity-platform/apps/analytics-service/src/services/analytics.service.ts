@@ -1,4 +1,4 @@
-import { PrismaService } from '@app/database';
+import { DatabaseService } from '@app/database';
 import { LoggerService } from '@app/logging';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import {
@@ -32,11 +32,9 @@ import {
 @Injectable()
 export class AnalyticsService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prisma: DatabaseService,
     private readonly logger: LoggerService,
-  ) {
-    this.logger.setContext('AnalyticsService');
-  }
+  ) {}
 
   // ======================== RISK SCORING ========================
 
@@ -323,17 +321,6 @@ export class AnalyticsService {
     const riskScore = await this.prisma.riskScore.findFirst({
       where: { userId: dto.userId },
       orderBy: { calculatedAt: 'desc' },
-    });
-
-    const enrollments = await this.prisma.enrollment.findMany({
-      where: { userId: dto.userId },
-      include: { course: true },
-    });
-
-    const phishingHistory = await this.prisma.phishingSimulation.findMany({
-      where: { userId: dto.userId },
-      orderBy: { emailSent: 'desc' },
-      take: 10,
     });
 
     const recommendations: RecommendationResponseDto[] = [];
@@ -741,7 +728,7 @@ export class AnalyticsService {
     return Math.min(100, incidents * 20);
   }
 
-  private async calculateLoginAnomalyScore(userId: string): Promise<number> {
+  private async calculateLoginAnomalyScore(_userId: string): Promise<number> {
     // Simplified - would need more complex anomaly detection
     return 10;
   }

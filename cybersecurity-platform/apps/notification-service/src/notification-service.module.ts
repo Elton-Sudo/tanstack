@@ -3,6 +3,11 @@ import { LoggingModule } from '@app/logging';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { HealthController } from './controllers/health.controller';
+import { NotificationController } from './controllers/notification.controller';
+import { EmailService } from './services/email.service';
+import { NotificationService } from './services/notification.service';
+import { PushNotificationService } from './services/push-notification.service';
+import { SmsService } from './services/sms.service';
 
 @Module({
   imports: [
@@ -13,7 +18,7 @@ import { HealthController } from './controllers/health.controller';
     DatabaseModule,
     LoggingModule,
   ],
-  controllers: [HealthController],
-  providers: [],
+  controllers: [HealthController, NotificationController],
+  providers: [NotificationService, EmailService, SmsService, PushNotificationService],
 })
 export class NotificationServiceModule {}

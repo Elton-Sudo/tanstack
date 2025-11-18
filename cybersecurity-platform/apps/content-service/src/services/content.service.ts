@@ -1,4 +1,4 @@
-import { PrismaService } from '@app/database';
+import { DatabaseService } from '@app/database';
 import { LoggerService } from '@app/logging';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import {
@@ -25,12 +25,10 @@ import { StorageService } from './storage.service';
 @Injectable()
 export class ContentService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prisma: DatabaseService,
     private readonly storage: StorageService,
     private readonly logger: LoggerService,
-  ) {
-    this.logger.setContext('ContentService');
-  }
+  ) {}
 
   /**
    * Upload a single file
