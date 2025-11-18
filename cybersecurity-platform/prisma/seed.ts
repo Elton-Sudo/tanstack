@@ -21,7 +21,7 @@ async function main() {
       status: 'ACTIVE',
       primaryColor: '#3B82F6',
       secondaryColor: '#1E40AF',
-      planType: 'ENTERPRISE',
+      subscriptionPlan: 'ENTERPRISE',
       maxUsers: 1000,
       features: {
         sso: true,
@@ -50,7 +50,7 @@ async function main() {
       status: 'TRIAL',
       primaryColor: '#10B981',
       secondaryColor: '#059669',
-      planType: 'TRIAL',
+      subscriptionPlan: 'TRIAL',
       maxUsers: 50,
       trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
       features: {
@@ -72,7 +72,12 @@ async function main() {
   const hashedPassword = await bcrypt.hash('Password123!', 10);
 
   const superAdmin = await prisma.user.upsert({
-    where: { email: 'superadmin@platform.com' },
+    where: {
+      tenantId_email: {
+        tenantId: tenant1.id,
+        email: 'superadmin@platform.com',
+      },
+    },
     update: {},
     create: {
       tenantId: tenant1.id,
@@ -87,7 +92,12 @@ async function main() {
   });
 
   const tenantAdmin = await prisma.user.upsert({
-    where: { email: 'admin@acme.com' },
+    where: {
+      tenantId_email: {
+        tenantId: tenant1.id,
+        email: 'admin@acme.com',
+      },
+    },
     update: {},
     create: {
       tenantId: tenant1.id,
@@ -103,7 +113,12 @@ async function main() {
   });
 
   const manager = await prisma.user.upsert({
-    where: { email: 'manager@acme.com' },
+    where: {
+      tenantId_email: {
+        tenantId: tenant1.id,
+        email: 'manager@acme.com',
+      },
+    },
     update: {},
     create: {
       tenantId: tenant1.id,
@@ -121,7 +136,12 @@ async function main() {
   const users = [];
   for (let i = 1; i <= 10; i++) {
     const user = await prisma.user.upsert({
-      where: { email: `user${i}@acme.com` },
+      where: {
+        tenantId_email: {
+          tenantId: tenant1.id,
+          email: `user${i}@acme.com`,
+        },
+      },
       update: {},
       create: {
         tenantId: tenant1.id,
@@ -149,7 +169,8 @@ async function main() {
     data: {
       tenantId: tenant1.id,
       title: 'Introduction to Cybersecurity Awareness',
-      description: 'Learn the fundamentals of cybersecurity awareness and best practices for staying safe online.',
+      description:
+        'Learn the fundamentals of cybersecurity awareness and best practices for staying safe online.',
       category: 'Security Basics',
       difficulty: 'BEGINNER',
       duration: 45,
@@ -313,7 +334,8 @@ async function main() {
             correctAnswer: 'b',
             points: 1,
             order: 1,
-            explanation: 'Phishing is a social engineering attack where attackers send fraudulent emails to trick victims into revealing sensitive information.',
+            explanation:
+              'Phishing is a social engineering attack where attackers send fraudulent emails to trick victims into revealing sensitive information.',
           },
           {
             type: 'TRUE_FALSE',
@@ -321,7 +343,8 @@ async function main() {
             correctAnswer: 'false',
             points: 1,
             order: 2,
-            explanation: 'Using unique passwords for each account prevents a single breach from compromising all your accounts.',
+            explanation:
+              'Using unique passwords for each account prevents a single breach from compromising all your accounts.',
           },
           {
             type: 'MULTIPLE_CHOICE',
@@ -335,7 +358,8 @@ async function main() {
             correctAnswer: 'd',
             points: 1,
             order: 3,
-            explanation: 'Long passphrases with multiple words are generally stronger than shorter passwords with complexity requirements.',
+            explanation:
+              'Long passphrases with multiple words are generally stronger than shorter passwords with complexity requirements.',
           },
         ],
       },
@@ -390,6 +414,7 @@ async function main() {
       data: {
         userId: user.id,
         courseId: course1.id,
+        tenantId: tenant1.id,
         progress: Math.floor(Math.random() * 100),
         status: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'][Math.floor(Math.random() * 3)] as any,
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
@@ -403,6 +428,7 @@ async function main() {
       data: {
         userId: users[i].id,
         courseId: course2.id,
+        tenantId: tenant1.id,
         progress: Math.floor(Math.random() * 50),
         status: ['NOT_STARTED', 'IN_PROGRESS'][Math.floor(Math.random() * 2)] as any,
         dueDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),

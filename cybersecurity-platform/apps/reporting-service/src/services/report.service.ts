@@ -46,7 +46,7 @@ export class ReportService {
           description: dto.description || '',
           format: dto.format,
           status: ReportStatus.PENDING,
-          filters: dto.filters || {},
+          filters: dto.filters ? JSON.parse(JSON.stringify(dto.filters)) : {},
           metadata: {
             includeCharts: dto.includeCharts,
             includeRawData: dto.includeRawData,
@@ -157,7 +157,9 @@ export class ReportService {
           description: dto.description || '',
           format: dto.format,
           status: ReportStatus.PENDING,
-          filters: { dateRange: dto.dateRange, framework: dto.framework },
+          filters: JSON.parse(
+            JSON.stringify({ dateRange: dto.dateRange, framework: dto.framework }),
+          ),
           metadata: {
             includeEvidence: dto.includeEvidence,
             includeRecommendations: dto.includeRecommendations,
@@ -228,17 +230,18 @@ export class ReportService {
           description: dto.description || '',
           format: dto.format,
           status: ReportStatus.PENDING,
-          filters: dto.filters || {},
-          metadata: {
-            columns: dto.columns,
-            dataSource: dto.dataSource,
-            groupBy: dto.groupBy,
-            orderBy: dto.orderBy,
-          },
+          filters: dto.filters ? JSON.parse(JSON.stringify(dto.filters)) : {},
+          metadata: JSON.parse(
+            JSON.stringify({
+              columns: dto.columns,
+              dataSource: dto.dataSource,
+              groupBy: dto.groupBy,
+              orderBy: dto.orderBy,
+            }),
+          ),
           generatedBy: userId,
         },
       });
-
       this.generateCustomReportAsync(report.id, tenantId, dto).catch((error) => {
         this.logger.error(`Failed to generate custom report ${report.id}`, error);
       });
@@ -373,7 +376,7 @@ export class ReportService {
                   .then((users) => users.map((u) => u.id)),
               }
             : undefined,
-          createdAt: dateFilter,
+          calculatedAt: dateFilter,
         },
         select: { overallScore: true },
       });
@@ -596,7 +599,7 @@ export class ReportService {
       const riskScores = await this.database.riskScore.findMany({
         where: {
           tenantId,
-          createdAt: { gte: startDate, lte: endDate },
+          calculatedAt: { gte: startDate, lte: endDate },
         },
         select: { overallScore: true },
       });
@@ -881,11 +884,11 @@ export class ReportService {
           reportType: dto.reportType,
           format: dto.format,
           frequency: dto.frequency,
-          dayOfWeek: dto.dayOfWeek,
+          dayOfWeek: dto.dayOfWeek ? this.getDayOfWeekNumber(dto.dayOfWeek) : null,
           dayOfMonth: dto.dayOfMonth,
           time: dto.time,
           recipients: dto.recipients,
-          filters: dto.filters || {},
+          filters: dto.filters ? JSON.parse(JSON.stringify(dto.filters)) : {},
           enabled: dto.enabled !== false,
           nextRunAt,
           createdBy: userId,
@@ -1117,5 +1120,18 @@ export class ReportService {
       createdAt: template.createdAt,
       updatedAt: template.updatedAt,
     };
+  }
+
+  private getDayOfWeekNumber(dayOfWeek: any): number {
+    const dayMap: Record<string, number> = {
+      MONDAY: 1,
+      TUESDAY: 2,
+      WEDNESDAY: 3,
+      THURSDAY: 4,
+      FRIDAY: 5,
+      SATURDAY: 6,
+      SUNDAY: 7,
+    };
+    return dayMap[dayOfWeek] || 1;
   }
 }

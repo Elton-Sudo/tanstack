@@ -28,6 +28,14 @@ import {
 export { ComplianceFramework, ReportFormat, ReportFrequency, ReportStatus, ReportType };
 
 // Custom enums not in Prisma
+export enum ScheduleFrequency {
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  QUARTERLY = 'QUARTERLY',
+  YEARLY = 'YEARLY',
+}
+
 export enum DayOfWeek {
   MONDAY = 'MONDAY',
   TUESDAY = 'TUESDAY',
@@ -259,10 +267,10 @@ export class ReportScheduleDto {
   @IsNotEmpty()
   format: ReportFormat;
 
-  @ApiProperty({ enum: ReportFrequency })
-  @IsEnum(ReportFrequency)
+  @ApiProperty({ enum: ScheduleFrequency })
+  @IsEnum(ScheduleFrequency)
   @IsNotEmpty()
-  frequency: ReportFrequency;
+  frequency: ScheduleFrequency;
 
   @ApiPropertyOptional({ enum: DayOfWeek })
   @IsOptional()
@@ -309,10 +317,10 @@ export class UpdateReportScheduleDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ enum: ReportFrequency })
+  @ApiPropertyOptional({ enum: ScheduleFrequency })
   @IsOptional()
-  @IsEnum(ReportFrequency)
-  frequency?: ReportFrequency;
+  @IsEnum(ScheduleFrequency)
+  frequency?: ScheduleFrequency;
 
   @ApiPropertyOptional({ enum: DayOfWeek })
   @IsOptional()
@@ -435,8 +443,8 @@ export class ReportScheduleResponseDto {
   @ApiProperty({ enum: ReportFormat })
   format: ReportFormat;
 
-  @ApiProperty({ enum: ReportFrequency })
-  frequency: ReportFrequency;
+  @ApiProperty({ enum: ScheduleFrequency })
+  frequency: ScheduleFrequency;
 
   @ApiProperty()
   dayOfWeek: string;

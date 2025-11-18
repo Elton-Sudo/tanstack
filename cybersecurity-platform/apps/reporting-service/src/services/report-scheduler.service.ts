@@ -1,6 +1,7 @@
 import { LoggerService } from '@app/logging';
 import { Injectable } from '@nestjs/common';
-import { DayOfWeek, ReportScheduleDto, ScheduleFrequency } from '../dto/report.dto';
+import { ReportFrequency } from '@prisma/client';
+import { DayOfWeek, ReportScheduleDto } from '../dto/report.dto';
 
 @Injectable()
 export class ReportSchedulerService {
@@ -19,11 +20,11 @@ export class ReportSchedulerService {
     }
 
     switch (dto.frequency) {
-      case ScheduleFrequency.DAILY:
+      case ReportFrequency.DAILY:
         // Already set to tomorrow if needed
         break;
 
-      case ScheduleFrequency.WEEKLY:
+      case ReportFrequency.WEEKLY:
         if (dto.dayOfWeek) {
           const targetDay = this.getDayNumber(dto.dayOfWeek);
           const currentDay = nextRun.getDay();
@@ -37,7 +38,7 @@ export class ReportSchedulerService {
         }
         break;
 
-      case ScheduleFrequency.MONTHLY:
+      case ReportFrequency.MONTHLY:
         if (dto.dayOfMonth) {
           nextRun.setDate(dto.dayOfMonth);
 
@@ -55,7 +56,7 @@ export class ReportSchedulerService {
         }
         break;
 
-      case ScheduleFrequency.QUARTERLY:
+      case ReportFrequency.QUARTERLY:
         // Set to first day of next quarter
         const currentQuarter = Math.floor(nextRun.getMonth() / 3);
         const nextQuarterMonth = (currentQuarter + 1) * 3;
@@ -67,7 +68,7 @@ export class ReportSchedulerService {
         }
         break;
 
-      case ScheduleFrequency.YEARLY:
+      case ReportFrequency.YEARLY:
         // Set to January 1st of next year
         nextRun.setMonth(0, 1);
 
