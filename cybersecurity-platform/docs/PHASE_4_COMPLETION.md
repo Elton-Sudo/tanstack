@@ -4,9 +4,9 @@
 
 Phase 4 of the Cybersecurity Training Platform has been successfully completed, delivering a comprehensive User Service that provides complete user lifecycle management, role-based access control, bulk operations, and activity tracking. The service is production-ready and follows enterprise-grade patterns established in previous phases.
 
-**Completion Date:** November 18, 2025  
-**Service Port:** 3003  
-**Endpoints Delivered:** 11  
+**Completion Date:** November 18, 2025
+**Service Port:** 3003
+**Endpoints Delivered:** 11
 **Lines of Code:** ~1,200
 
 ---
@@ -14,6 +14,7 @@ Phase 4 of the Cybersecurity Training Platform has been successfully completed, 
 ## ✅ Features Implemented
 
 ### 1. User CRUD Operations
+
 - ✅ Create users with validation and tenant limit checks
 - ✅ List users with pagination and advanced filtering
 - ✅ Get user by ID with tenant isolation
@@ -21,6 +22,7 @@ Phase 4 of the Cybersecurity Training Platform has been successfully completed, 
 - ✅ Soft delete users with session revocation
 
 ### 2. User Invitation System
+
 - ✅ Send email invitations with secure tokens
 - ✅ 7-day invitation expiration
 - ✅ Temporary password generation
@@ -28,6 +30,7 @@ Phase 4 of the Cybersecurity Training Platform has been successfully completed, 
 - ✅ Event-driven email notifications
 
 ### 3. Role Management
+
 - ✅ 5-tier role hierarchy (SUPER_ADMIN → TENANT_ADMIN → MANAGER → INSTRUCTOR → USER)
 - ✅ Role-based access control for all endpoints
 - ✅ Role change with audit logging
@@ -35,12 +38,14 @@ Phase 4 of the Cybersecurity Training Platform has been successfully completed, 
 - ✅ Role change event emissions
 
 ### 4. Bulk Operations
+
 - ✅ Bulk user creation with error handling
 - ✅ Detailed success/failure reporting
 - ✅ Transaction-like error recovery
 - ✅ Export users to CSV format
 
 ### 5. Security Features
+
 - ✅ Password hashing with bcrypt (10 rounds)
 - ✅ Admin password reset with session revocation
 - ✅ Account unlock on password reset
@@ -48,12 +53,14 @@ Phase 4 of the Cybersecurity Training Platform has been successfully completed, 
 - ✅ Tenant isolation enforcement
 
 ### 6. Activity Tracking
+
 - ✅ User login history
 - ✅ Course enrollment statistics
 - ✅ Quiz attempt tracking
 - ✅ Audit log integration
 
 ### 7. Advanced Features
+
 - ✅ Search by name, email, role, department
 - ✅ Filter by email verification and MFA status
 - ✅ Tenant user limit validation
@@ -91,25 +98,26 @@ docs/
 
 ## 🔌 API Endpoints
 
-| Method | Endpoint | Description | Roles |
-|--------|----------|-------------|-------|
-| POST | `/users` | Create user | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
-| GET | `/users` | List users with filters | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
-| GET | `/users/:id` | Get user details | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
-| PATCH | `/users/:id` | Update user | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
-| DELETE | `/users/:id` | Delete user | SUPER_ADMIN, TENANT_ADMIN |
-| POST | `/users/invite` | Invite new user | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
-| POST | `/users/bulk` | Bulk create users | SUPER_ADMIN, TENANT_ADMIN |
-| PATCH | `/users/:id/role` | Change user role | SUPER_ADMIN, TENANT_ADMIN |
-| POST | `/users/:id/reset-password` | Reset password | SUPER_ADMIN, TENANT_ADMIN |
-| GET | `/users/:id/activity` | Get activity history | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
-| GET | `/users/export/csv` | Export to CSV | SUPER_ADMIN, TENANT_ADMIN |
+| Method | Endpoint                    | Description             | Roles                              |
+| ------ | --------------------------- | ----------------------- | ---------------------------------- |
+| POST   | `/users`                    | Create user             | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
+| GET    | `/users`                    | List users with filters | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
+| GET    | `/users/:id`                | Get user details        | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
+| PATCH  | `/users/:id`                | Update user             | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
+| DELETE | `/users/:id`                | Delete user             | SUPER_ADMIN, TENANT_ADMIN          |
+| POST   | `/users/invite`             | Invite new user         | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
+| POST   | `/users/bulk`               | Bulk create users       | SUPER_ADMIN, TENANT_ADMIN          |
+| PATCH  | `/users/:id/role`           | Change user role        | SUPER_ADMIN, TENANT_ADMIN          |
+| POST   | `/users/:id/reset-password` | Reset password          | SUPER_ADMIN, TENANT_ADMIN          |
+| GET    | `/users/:id/activity`       | Get activity history    | SUPER_ADMIN, TENANT_ADMIN, MANAGER |
+| GET    | `/users/export/csv`         | Export to CSV           | SUPER_ADMIN, TENANT_ADMIN          |
 
 ---
 
 ## 📊 Data Transfer Objects (DTOs)
 
 ### Input DTOs
+
 1. **CreateUserDto** - User creation with password
 2. **UpdateUserDto** - Partial user updates
 3. **InviteUserDto** - User invitation without password
@@ -119,6 +127,7 @@ docs/
 7. **UserSearchDto** - Advanced search filters
 
 ### Enums
+
 1. **UserRole** - SUPER_ADMIN, TENANT_ADMIN, MANAGER, INSTRUCTOR, USER
 
 ---
@@ -126,18 +135,21 @@ docs/
 ## 🔐 Security Implementation
 
 ### Authentication & Authorization
+
 - JWT-based authentication via `JwtAuthGuard`
 - Role-based access control via `RolesGuard`
 - Tenant isolation for non-SUPER_ADMIN users
 - Session revocation on password reset/deletion
 
 ### Password Security
+
 - bcrypt hashing with 10 salt rounds
 - Minimum 8 characters requirement
 - Secure password reset flow
 - Failed attempt tracking
 
 ### Rate Limiting
+
 - 100 requests per minute per IP
 - Configured via `ThrottlerModule`
 
@@ -147,12 +159,12 @@ docs/
 
 The User Service emits events for integration with other services:
 
-| Event | Description | Consumer Services |
-|-------|-------------|-------------------|
-| `USER_CREATED` | New user created | Notification Service, Analytics |
-| `USER_UPDATED` | User profile updated | Analytics Service |
-| `USER_DELETED` | User deleted | Analytics, Cleanup Services |
-| `USER_INVITED` | User invitation sent | Notification Service (email) |
+| Event          | Description          | Consumer Services               |
+| -------------- | -------------------- | ------------------------------- |
+| `USER_CREATED` | New user created     | Notification Service, Analytics |
+| `USER_UPDATED` | User profile updated | Analytics Service               |
+| `USER_DELETED` | User deleted         | Analytics, Cleanup Services     |
+| `USER_INVITED` | User invitation sent | Notification Service (email)    |
 
 ---
 
@@ -182,6 +194,7 @@ http://localhost:3003/api/docs
 ### 3. Test Scenarios
 
 #### Scenario 1: Create User
+
 ```bash
 curl -X POST http://localhost:3003/users \
   -H "Authorization: Bearer <admin-token>" \
@@ -197,6 +210,7 @@ curl -X POST http://localhost:3003/users \
 ```
 
 #### Scenario 2: Invite User
+
 ```bash
 curl -X POST http://localhost:3003/users/invite \
   -H "Authorization: Bearer <admin-token>" \
@@ -210,12 +224,14 @@ curl -X POST http://localhost:3003/users/invite \
 ```
 
 #### Scenario 3: List Users with Filters
+
 ```bash
 curl -X GET "http://localhost:3003/users?search=test&department=Engineering&page=1&limit=20" \
   -H "Authorization: Bearer <admin-token>"
 ```
 
 #### Scenario 4: Change User Role
+
 ```bash
 curl -X PATCH http://localhost:3003/users/<user-id>/role \
   -H "Authorization: Bearer <admin-token>" \
@@ -227,6 +243,7 @@ curl -X PATCH http://localhost:3003/users/<user-id>/role \
 ```
 
 #### Scenario 5: Bulk Create Users
+
 ```bash
 curl -X POST http://localhost:3003/users/bulk \
   -H "Authorization: Bearer <admin-token>" \
@@ -273,7 +290,7 @@ user-service:
     context: .
     dockerfile: apps/user-service/Dockerfile
   ports:
-    - "3003:3003"
+    - '3003:3003'
   environment:
     - USER_SERVICE_PORT=3003
     - DATABASE_URL=${DATABASE_URL}
@@ -298,12 +315,14 @@ curl http://localhost:3003/health
 ## 📈 Performance Metrics
 
 ### Database Queries
+
 - User creation: 3 queries (check exist, create, update token)
 - User list: 2 queries (data + count)
 - User update: 2 queries (verify + update)
 - Bulk create: N+3 queries per user (optimized)
 
 ### Expected Response Times
+
 - Create user: < 300ms
 - List users: < 200ms
 - Get user: < 100ms
@@ -315,12 +334,14 @@ curl http://localhost:3003/health
 ## 🔗 Integration Points
 
 ### Dependencies
+
 - **Auth Service**: JWT validation, session management
 - **Tenant Service**: User limit validation
 - **Notification Service**: Email invitations
 - **Analytics Service**: Activity tracking
 
 ### Database Models Used
+
 - `User` (primary)
 - `Tenant` (user limit check)
 - `Session` (revocation)
@@ -342,6 +363,7 @@ curl http://localhost:3003/health
 ## 🔮 Future Enhancements
 
 ### Phase 5+ Improvements
+
 1. **Advanced Search**: Elasticsearch integration
 2. **File Upload**: Direct avatar upload support
 3. **User Groups**: Group management functionality
@@ -379,6 +401,7 @@ curl http://localhost:3003/health
 With Phase 4 complete, the platform is ready for Phase 5: **Course Service Implementation**
 
 ### Phase 5 Scope
+
 - Course CRUD operations
 - Module and lesson management
 - SCORM package support
@@ -389,6 +412,7 @@ With Phase 4 complete, the platform is ready for Phase 5: **Course Service Imple
 - Content library integration
 
 ### Prerequisites
+
 - ✅ User Service operational (Phase 4)
 - ✅ Tenant Service operational (Phase 3)
 - ✅ Auth Service operational (Phase 2)

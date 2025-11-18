@@ -1,3 +1,4 @@
+import { JwtAuthGuard, Roles, RolesGuard } from '@app/auth';
 import {
   Body,
   Controller,
@@ -11,7 +12,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard, Roles, RolesGuard } from '@app/auth';
 import {
   BulkCreateUserDto,
   ChangeUserRoleDto,

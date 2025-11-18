@@ -22,13 +22,13 @@ Authorization: Bearer <token>
 
 The service supports the following roles with hierarchical permissions:
 
-| Role | Description | Permissions |
-|------|-------------|-------------|
-| `SUPER_ADMIN` | Platform administrator | Full access to all tenants |
-| `TENANT_ADMIN` | Tenant administrator | Full access within tenant |
-| `MANAGER` | Department manager | Manage users in department |
-| `USER` | Standard user | Read-only access to own data |
-| `INSTRUCTOR` | Course instructor | Teach courses and grade assessments |
+| Role           | Description            | Permissions                         |
+| -------------- | ---------------------- | ----------------------------------- |
+| `SUPER_ADMIN`  | Platform administrator | Full access to all tenants          |
+| `TENANT_ADMIN` | Tenant administrator   | Full access within tenant           |
+| `MANAGER`      | Department manager     | Manage users in department          |
+| `USER`         | Standard user          | Read-only access to own data        |
+| `INSTRUCTOR`   | Course instructor      | Teach courses and grade assessments |
 
 ## Endpoints
 
@@ -78,6 +78,7 @@ Create a new user within a tenant.
 ```
 
 **Validation Rules:**
+
 - Email must be valid and unique within tenant
 - Password minimum 8 characters
 - First/last name 2-50 characters
@@ -95,16 +96,16 @@ Get all users with pagination and filtering.
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| page | number | No | Page number (default: 1) |
-| limit | number | No | Items per page (default: 20) |
-| search | string | No | Search in name/email |
-| role | string | No | Filter by role |
-| department | string | No | Filter by department |
-| emailVerified | boolean | No | Filter by email verification status |
-| mfaEnabled | boolean | No | Filter by MFA status |
-| tenantId | string | No | Tenant ID (SUPER_ADMIN only) |
+| Parameter     | Type    | Required | Description                         |
+| ------------- | ------- | -------- | ----------------------------------- |
+| page          | number  | No       | Page number (default: 1)            |
+| limit         | number  | No       | Items per page (default: 20)        |
+| search        | string  | No       | Search in name/email                |
+| role          | string  | No       | Filter by role                      |
+| department    | string  | No       | Filter by department                |
+| emailVerified | boolean | No       | Filter by email verification status |
+| mfaEnabled    | boolean | No       | Filter by MFA status                |
+| tenantId      | string  | No       | Tenant ID (SUPER_ADMIN only)        |
 
 **Example Request:**
 
@@ -235,6 +236,7 @@ Soft delete a user (cannot delete SUPER_ADMIN).
 ```
 
 **Business Rules:**
+
 - Cannot delete SUPER_ADMIN users
 - Email is prefixed with `deleted_{timestamp}_` to allow recreation
 - All sessions are revoked
@@ -274,6 +276,7 @@ Send an invitation to a new user.
 ```
 
 **Business Logic:**
+
 - User account is created with temporary password
 - Invitation expires after 7 days
 - Email verification required on first login
@@ -374,6 +377,7 @@ Change a user's role.
 ```
 
 **Business Rules:**
+
 - Cannot change SUPER_ADMIN role
 - Role change is logged in audit trail
 - All existing sessions remain valid
@@ -406,6 +410,7 @@ Admin-initiated password reset.
 ```
 
 **Business Logic:**
+
 - All user sessions are revoked
 - Failed login attempts counter is reset
 - Account lock is removed if locked
@@ -489,11 +494,11 @@ Export all users in a tenant to CSV format.
 
 The User Service emits the following events:
 
-| Event | Trigger | Payload |
-|-------|---------|---------|
-| `USER_CREATED` | User creation | userId, email, firstName, lastName, tenantId, verificationToken |
-| `USER_UPDATED` | User update | userId, tenantId, changes, updatedBy |
-| `USER_DELETED` | User deletion | userId, tenantId, deletedBy |
+| Event          | Trigger         | Payload                                                                                      |
+| -------------- | --------------- | -------------------------------------------------------------------------------------------- |
+| `USER_CREATED` | User creation   | userId, email, firstName, lastName, tenantId, verificationToken                              |
+| `USER_UPDATED` | User update     | userId, tenantId, changes, updatedBy                                                         |
+| `USER_DELETED` | User deletion   | userId, tenantId, deletedBy                                                                  |
 | `USER_INVITED` | User invitation | userId, email, firstName, lastName, tenantId, invitationToken, expiresAt, invitedBy, message |
 
 ---
@@ -555,6 +560,7 @@ The User Service emits the following events:
 ## Rate Limiting
 
 All endpoints are rate-limited to:
+
 - **100 requests per minute** per IP address
 
 Exceeded limits return `429 Too Many Requests`.
@@ -715,28 +721,33 @@ const exportUsers = async () => {
 ## Business Rules
 
 ### User Creation
+
 - Email must be unique within tenant
 - Password must meet complexity requirements (min 8 chars)
 - Tenant must not exceed subscription user limit
 - Verification email sent if `sendInvitation` is true
 
 ### User Invitation
+
 - Creates user with temporary password
 - Invitation expires after 7 days
 - User must verify email and set password on first login
 
 ### Role Changes
+
 - Cannot change SUPER_ADMIN role
 - Role changes are logged in audit trail
 - Existing sessions remain valid after role change
 
 ### User Deletion
+
 - Cannot delete SUPER_ADMIN users
 - Soft delete (email prefixed, account disabled)
 - All sessions revoked
 - MFA disabled
 
 ### Tenant User Limits
+
 - Free: 10 users
 - Trial: 10 users
 - Starter: 50 users
@@ -754,6 +765,7 @@ http://localhost:3003/api/docs
 ```
 
 The Swagger UI provides:
+
 - Interactive endpoint testing
 - Request/response schemas
 - Authentication testing
