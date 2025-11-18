@@ -1,0 +1,78 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'cybersecurity-platform'
+    environment: 'development'
+
+scrape_configs:
+  # Auth Service
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['localhost:3001']
+        labels:
+          service: 'auth-service'
+
+  # Tenant Service
+  - job_name: 'tenant-service'
+    static_configs:
+      - targets: ['localhost:3002']
+        labels:
+          service: 'tenant-service'
+
+  # Course Service
+  - job_name: 'course-service'
+    static_configs:
+      - targets: ['localhost:3003']
+        labels:
+          service: 'course-service'
+
+  # Content Service
+  - job_name: 'content-service'
+    static_configs:
+      - targets: ['localhost:3004']
+        labels:
+          service: 'content-service'
+
+  # Analytics Service
+  - job_name: 'analytics-service'
+    static_configs:
+      - targets: ['localhost:3005']
+        labels:
+          service: 'analytics-service'
+
+  # Reporting Service
+  - job_name: 'reporting-service'
+    static_configs:
+      - targets: ['localhost:3006']
+        labels:
+          service: 'reporting-service'
+
+  # Notification Service
+  - job_name: 'notification-service'
+    static_configs:
+      - targets: ['localhost:3007']
+        labels:
+          service: 'notification-service'
+
+  # Integration Service
+  - job_name: 'integration-service'
+    static_configs:
+      - targets: ['localhost:3008']
+        labels:
+          service: 'integration-service'
+
+  # PostgreSQL Exporter
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['localhost:9187']
+
+  # Redis Exporter
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['localhost:9121']
+
+  # Node Exporter (System metrics)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']

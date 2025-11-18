@@ -1,0 +1,577 @@
+// This is your Prisma schema file
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+    SUPER_ADMIN
+    TENANT_ADMIN
+    MANAGER
+    USER
+    INSTRUCTOR
+}
+
+enum TenantStatus {
+    ACTIVE
+    SUSPENDED
+    TRIAL
+    EXPIRED
+}
+
+enum CourseStatus {
+    DRAFT
+    PUBLISHED
+    ARCHIVED
+}
+
+enum Difficulty {
+    BEGINNER
+    INTERMEDIATE
+    ADVANCED
+    EXPERT
+}
+
+enum EnrollmentStatus {
+    NOT_STARTED
+    IN_PROGRESS
+    COMPLETED
+    FAILED
+    EXPIRED
+}
+
+enum QuestionType {
+    MULTIPLE_CHOICE
+    TRUE_FALSE
+    SHORT_ANSWER
+    ESSAY
+}
+
+enum NotificationType {
+    EMAIL
+    SMS
+    IN_APP
+    PUSH
+}
+
+enum NotificationStatus {
+    PENDING
+    SENT
+    FAILED
+    READ
+}
+
+enum WebhookStatus {
+    ACTIVE
+    INACTIVE
+    FAILED
+}
+
+enum IntegrationType {
+    HRIS
+    LMS
+    BI_TOOL
+    SSO
+    WEBHOOK
+}
+
+enum FileType {
+    IMAGE
+    VIDEO
+    DOCUMENT
+    SCORM
+    OTHER
+}
+
+enum TranscodingStatus {
+    PENDING
+    PROCESSING
+    COMPLETED
+    FAILED
+}
+
+// ============================================
+// AUTH SERVICE MODELS
+// ============================================
+
+model User {
+    id                String    @id @default(uuid())
+    tenantId          String
+    email             String
+    passwordHash      String
+    firstName         String
+    lastName          String
+    role              Role      @default(USER)
+    mfaEnabled        Boolean   @default(false)
+    mfaSecret         String?
+    emailVerified     Boolean   @default(false)
+    verificationToken String?
+    lastLoginAt       DateTime?
+    failedAttempts    Int       @default(0)
+    lockedUntil       DateTime?
+    avatar            String?
+    phoneNumber       String?
+    department        String?
+    position          String?
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt
+
+    // Relations
+    tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+    sessions      Session[]
+    auditLogs     AuditLog[]
+    enrollments   Enrollment[]
+    quizAttempts  QuizAttempt[]
+    riskScores    RiskScore[]
+    notifications Notification[]
+    apiKeys       ApiKey[]
+
+    @@unique([tenantId, email])
+    @@index([tenantId])
+    @@index([email])
+}
+
+model Session {
+    id           String   @id @default(uuid())
+    userId       String
+    token        String   @unique
+    refreshToken String   @unique
+    expiresAt    DateTime
+    ipAddress    String
+    userAgent    String
+    isRevoked    Boolean  @default(false)
+    createdAt    DateTime @default(now())
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([token])
+}
+
+model AuditLog {
+    id         String   @id @default(uuid())
+    userId     String?
+    tenantId   String
+    action     String
+    resource   String
+    resourceId String?
+    ipAddress  String?
+    userAgent  String?
+    metadata   Json?
+    createdAt  DateTime @default(now())
+
+    // Relations
+    user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    @@index([userId])
+    @@index([tenantId])
+    @@index([createdAt])
+}
+
+// ============================================
+// TENANT SERVICE MODELS
+// ============================================
+
+model Tenant {
+    id             String       @id @default(uuid())
+    name           String
+    slug           String       @unique
+    domain         String?      @unique
+    status         TenantStatus @default(TRIAL)
+    logo           String?
+    primaryColor   String?      @default("#3B82F6")
+    secondaryColor String?      @default("#1E40AF")
+    favicon        String?
+    subscriptionId String?
+    planType       String?      @default("FREE")
+    maxUsers       Int          @default(100)
+    features       Json? // Feature flags
+    settings       Json? // Custom settings
+    trialEndsAt    DateTime?
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+
+    // Relations
+    users         User[]
+    courses       Course[]
+    learningPaths LearningPath[]
+
+    @@index([slug])
+    @@index([status])
+}
+
+// ============================================
+// COURSE SERVICE MODELS
+// ============================================
+
+model Course {
+    id                  String       @id @default(uuid())
+    tenantId            String
+    title               String
+    description         String?
+    category            String
+    difficulty          Difficulty   @default(BEGINNER)
+    duration            Int // minutes
+    scormPackage        String?
+    thumbnail           String?
+    status              CourseStatus @default(DRAFT)
+    version             Int          @default(1)
+    prerequisites       String[] // Course IDs
+    tags                String[]
+    passingScore        Int          @default(70)
+    certificateTemplate String?
+    createdBy           String
+    publishedAt         DateTime?
+    createdAt           DateTime     @default(now())
+    updatedAt           DateTime     @updatedAt
+
+    // Relations
+    tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+    modules     Module[]
+    enrollments Enrollment[]
+    quizzes     Quiz[]
+    pathCourses PathCourse[]
+
+    @@index([tenantId, status])
+    @@index([category])
+}
+
+model Module {
+    id          String   @id @default(uuid())
+    courseId    String
+    title       String
+    description String?
+    order       Int
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Relations
+    course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    chapters Chapter[]
+
+    @@index([courseId])
+}
+
+model Chapter {
+    id         String   @id @default(uuid())
+    moduleId   String
+    title      String
+    content    String?  @db.Text
+    videoUrl   String?
+    duration   Int? // minutes
+    order      Int
+    isRequired Boolean  @default(true)
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    // Relations
+    module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+    @@index([moduleId])
+}
+
+model Enrollment {
+    id             String           @id @default(uuid())
+    userId         String
+    courseId       String
+    progress       Int              @default(0)
+    status         EnrollmentStatus @default(NOT_STARTED)
+    startedAt      DateTime         @default(now())
+    completedAt    DateTime?
+    dueDate        DateTime?
+    score          Float?
+    certificateUrl String?
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+
+    // Relations
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, courseId])
+    @@index([userId])
+    @@index([courseId])
+    @@index([status])
+}
+
+model Quiz {
+    id               String   @id @default(uuid())
+    courseId         String
+    title            String
+    description      String?
+    passingScore     Int      @default(70)
+    timeLimit        Int? // minutes
+    maxAttempts      Int      @default(3)
+    shuffleQuestions Boolean  @default(false)
+    showResults      Boolean  @default(true)
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+
+    // Relations
+    course    Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    questions Question[]
+    attempts  QuizAttempt[]
+
+    @@index([courseId])
+}
+
+model Question {
+    id            String       @id @default(uuid())
+    quizId        String
+    type          QuestionType
+    question      String       @db.Text
+    options       Json? // For multiple choice
+    correctAnswer String       @db.Text
+    points        Int          @default(1)
+    explanation   String?      @db.Text
+    order         Int
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+
+    // Relations
+    quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+    @@index([quizId])
+}
+
+model QuizAttempt {
+    id          String   @id @default(uuid())
+    userId      String
+    quizId      String
+    score       Float
+    answers     Json // User's answers
+    isPassing   Boolean
+    completedAt DateTime @default(now())
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([quizId])
+}
+
+model LearningPath {
+    id          String   @id @default(uuid())
+    tenantId    String
+    title       String
+    description String?
+    thumbnail   String?
+    isRequired  Boolean  @default(false)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Relations
+    tenant  Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+    courses PathCourse[]
+
+    @@index([tenantId])
+}
+
+model PathCourse {
+    id         String  @id @default(uuid())
+    pathId     String
+    courseId   String
+    order      Int
+    isRequired Boolean @default(true)
+
+    // Relations
+    path   LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+    course Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+    @@unique([pathId, courseId])
+    @@index([pathId])
+    @@index([courseId])
+}
+
+// ============================================
+// CONTENT SERVICE MODELS
+// ============================================
+
+model Media {
+    id                String             @id @default(uuid())
+    tenantId          String
+    filename          String
+    originalName      String
+    mimeType          String
+    size              Int // bytes
+    url               String
+    cdnUrl            String?
+    type              FileType
+    metadata          Json?
+    uploadedBy        String
+    transcodingStatus TranscodingStatus?
+    createdAt         DateTime           @default(now())
+
+    @@index([tenantId])
+    @@index([type])
+}
+
+model ScormPackage {
+    id          String   @id @default(uuid())
+    courseId    String
+    version     String // 1.2 or 2004
+    manifest    Json
+    extractPath String
+    createdAt   DateTime @default(now())
+
+    @@index([courseId])
+}
+
+// ============================================
+// ANALYTICS SERVICE MODELS
+// ============================================
+
+model RiskScore {
+    id                      String   @id @default(uuid())
+    userId                  String
+    tenantId                String
+    overallScore            Float // 0-100
+    phishingScore           Float
+    trainingCompletionScore Float
+    timeSinceTrainingScore  Float
+    quizPerformanceScore    Float
+    securityIncidentScore   Float
+    loginAnomalyScore       Float
+    calculatedAt            DateTime @default(now())
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([tenantId])
+    @@index([overallScore])
+}
+
+model PhishingSimulation {
+    id          String    @id @default(uuid())
+    tenantId    String
+    userId      String
+    campaignId  String
+    emailSent   DateTime
+    wasClicked  Boolean   @default(false)
+    wasReported Boolean   @default(false)
+    clickedAt   DateTime?
+    reportedAt  DateTime?
+
+    @@index([tenantId])
+    @@index([userId])
+    @@index([campaignId])
+}
+
+model BehaviorPattern {
+    id          String   @id @default(uuid())
+    userId      String
+    tenantId    String
+    patternType String
+    metadata    Json
+    detectedAt  DateTime @default(now())
+
+    @@index([userId])
+    @@index([tenantId])
+}
+
+// ============================================
+// NOTIFICATION SERVICE MODELS
+// ============================================
+
+model Notification {
+    id        String             @id @default(uuid())
+    userId    String
+    tenantId  String
+    type      NotificationType
+    status    NotificationStatus @default(PENDING)
+    title     String
+    message   String             @db.Text
+    metadata  Json?
+    sentAt    DateTime?
+    readAt    DateTime?
+    createdAt DateTime           @default(now())
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([tenantId])
+    @@index([status])
+}
+
+model NotificationTemplate {
+    id        String           @id @default(uuid())
+    tenantId  String?
+    name      String
+    type      NotificationType
+    subject   String?
+    template  String           @db.Text
+    variables String[]
+    isActive  Boolean          @default(true)
+    createdAt DateTime         @default(now())
+    updatedAt DateTime         @updatedAt
+
+    @@index([tenantId])
+    @@index([type])
+}
+
+// ============================================
+// INTEGRATION SERVICE MODELS
+// ============================================
+
+model ApiKey {
+    id          String    @id @default(uuid())
+    userId      String
+    tenantId    String
+    name        String
+    key         String    @unique
+    isActive    Boolean   @default(true)
+    lastUsedAt  DateTime?
+    expiresAt   DateTime?
+    permissions Json?
+    createdAt   DateTime  @default(now())
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([tenantId])
+    @@index([key])
+}
+
+model Webhook {
+    id              String        @id @default(uuid())
+    tenantId        String
+    url             String
+    events          String[]
+    secret          String
+    status          WebhookStatus @default(ACTIVE)
+    lastTriggeredAt DateTime?
+    failureCount    Int           @default(0)
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
+
+    @@index([tenantId])
+    @@index([status])
+}
+
+model Integration {
+    id         String          @id @default(uuid())
+    tenantId   String
+    type       IntegrationType
+    name       String
+    config     Json // Encrypted config data
+    isActive   Boolean         @default(true)
+    lastSyncAt DateTime?
+    createdAt  DateTime        @default(now())
+    updatedAt  DateTime        @updatedAt
+
+    @@index([tenantId])
+    @@index([type])
+}
