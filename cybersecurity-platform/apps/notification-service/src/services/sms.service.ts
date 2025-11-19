@@ -67,7 +67,6 @@ export class SmsService {
           code,
           expiresAt,
           verified: false,
-          purpose,
         },
       });
 

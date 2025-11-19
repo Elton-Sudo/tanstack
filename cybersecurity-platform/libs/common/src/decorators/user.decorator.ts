@@ -10,16 +10,12 @@ export const CurrentUser = createParamDecorator(
   },
 );
 
-export const CurrentTenant = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.tenant;
-  },
-);
+export const CurrentTenant = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest();
+  return request.tenant;
+});
 
-export const TenantId = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user?.tenantId || request.headers['x-tenant-id'];
-  },
-);
+export const TenantId = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest();
+  return request.user?.tenantId || request.headers['x-tenant-id'];
+});

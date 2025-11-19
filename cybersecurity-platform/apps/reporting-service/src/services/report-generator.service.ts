@@ -123,8 +123,6 @@ export class ReportGeneratorService {
         return 'csv';
       case ReportFormat.JSON:
         return 'json';
-      case ReportFormat.HTML:
-        return 'html';
       default:
         return 'pdf';
     }

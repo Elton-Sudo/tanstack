@@ -1,18 +1,16 @@
 import { DatabaseService } from '@app/database';
 import { LoggerService } from '@app/logging';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { NotificationCategory, NotificationStatus, NotificationType } from '@prisma/client';
 import {
   BulkNotificationDto,
   CreateTemplateDto,
   MarkAsReadDto,
-  NotificationCategory,
   NotificationChannel,
   NotificationPreferenceDto,
   NotificationPreferenceResponseDto,
   NotificationResponseDto,
   NotificationStatsDto,
-  NotificationStatus,
-  NotificationType,
   QueryNotificationsDto,
   SendFromTemplateDto,
   SendInAppNotificationDto,
@@ -52,16 +50,13 @@ export class NotificationService {
           tenantId,
           userId: dto.userId,
           type: NotificationType.IN_APP,
-          status: NotificationStatus.DELIVERED,
+          status: 'DELIVERED',
           title: dto.title,
           message: dto.message,
           category: dto.category || NotificationCategory.CUSTOM,
-          priority: dto.priority || 'MEDIUM',
           read: false,
-          actionUrl: dto.actionUrl || '',
           metadata: dto.metadata || {},
           sentAt: new Date(),
-          deliveredAt: new Date(),
         },
       });
 
@@ -111,16 +106,13 @@ export class NotificationService {
             tenantId,
             userId,
             type: NotificationType.PUSH,
-            status: success ? NotificationStatus.DELIVERED : NotificationStatus.FAILED,
+            status: success ? 'DELIVERED' : 'FAILED',
             title: dto.title,
             message: dto.body,
             category: NotificationCategory.CUSTOM,
-            priority: dto.priority || 'MEDIUM',
             read: false,
-            actionUrl: dto.actionUrl || '',
             metadata: dto.data || {},
             sentAt: new Date(),
-            deliveredAt: success ? new Date() : null,
           },
         });
 
@@ -173,11 +165,11 @@ export class NotificationService {
           } else if (channel === NotificationChannel.SMS && preferences.smsEnabled) {
             const user = await this.database.user.findUnique({
               where: { id: userId },
-              select: { phone: true },
+              select: { phoneNumber: true },
             });
-            if (user?.phone) {
+            if (user?.phoneNumber) {
               await this.smsService.sendSms({
-                to: user.phone,
+                to: user.phoneNumber,
                 message: dto.message,
                 priority: dto.priority,
                 metadata: dto.metadata,
@@ -365,11 +357,9 @@ export class NotificationService {
         type: dto.type,
         category: dto.category || NotificationCategory.CUSTOM,
         subject: dto.subject || '',
-        body: dto.body,
-        htmlBody: dto.htmlBody || '',
+        template: dto.body,
         variables: dto.variables || [],
-        isDefault: dto.isDefault || false,
-        createdBy: userId,
+        isActive: dto.isDefault || false,
       },
     });
 
@@ -511,7 +501,6 @@ export class NotificationService {
           smsEnabled: true,
           inAppEnabled: true,
           pushEnabled: true,
-          categoryPreferences: {},
         },
       });
     }
@@ -543,7 +532,6 @@ export class NotificationService {
           smsEnabled: dto.smsEnabled ?? true,
           inAppEnabled: dto.inAppEnabled ?? true,
           pushEnabled: dto.pushEnabled ?? true,
-          categoryPreferences: dto.categoryPreferences || {},
         },
       });
     }
@@ -617,7 +605,7 @@ export class NotificationService {
       actionUrl: notification.actionUrl,
       metadata: notification.metadata,
       sentAt: notification.sentAt,
-      deliveredAt: notification.deliveredAt,
+      deliveredAt: notification.sentAt, // Use sentAt as fallback
       createdAt: notification.createdAt,
     };
   }
@@ -627,15 +615,15 @@ export class NotificationService {
       id: template.id,
       tenantId: template.tenantId,
       name: template.name,
-      description: template.description,
+      description: template.description || '',
       type: template.type,
       category: template.category,
-      subject: template.subject,
-      body: template.body,
-      htmlBody: template.htmlBody,
+      subject: template.subject || '',
+      body: template.template,
+      htmlBody: '', // Not in schema
       variables: template.variables,
-      isDefault: template.isDefault,
-      createdBy: template.createdBy,
+      isDefault: template.isActive,
+      createdBy: '', // Not in schema
       createdAt: template.createdAt,
       updatedAt: template.updatedAt,
     };
@@ -650,7 +638,7 @@ export class NotificationService {
       smsEnabled: preferences.smsEnabled,
       inAppEnabled: preferences.inAppEnabled,
       pushEnabled: preferences.pushEnabled,
-      categoryPreferences: preferences.categoryPreferences,
+      categoryPreferences: {}, // Not in schema, return empty object
       createdAt: preferences.createdAt,
       updatedAt: preferences.updatedAt,
     };

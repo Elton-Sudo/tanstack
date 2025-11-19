@@ -2,10 +2,7 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class DatabaseService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class DatabaseService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     await this.$connect();
     console.log('✅ Database connected successfully');
@@ -21,12 +18,8 @@ export class DatabaseService
       throw new Error('Cannot clean database in production!');
     }
 
-    const models = Reflect.ownKeys(this).filter(
-      (key) => key[0] !== '_' && key[0] !== '$',
-    );
+    const models = Reflect.ownKeys(this).filter((key) => key[0] !== '_' && key[0] !== '$');
 
-    return Promise.all(
-      models.map((modelKey) => (this as any)[modelKey].deleteMany()),
-    );
+    return Promise.all(models.map((modelKey) => (this as any)[modelKey].deleteMany()));
   }
 }

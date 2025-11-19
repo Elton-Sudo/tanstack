@@ -1,11 +1,11 @@
 // This is your Prisma schema file
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ============================================
@@ -13,132 +13,140 @@ datasource db {
 // ============================================
 
 enum Role {
-    SUPER_ADMIN
-    TENANT_ADMIN
-    MANAGER
-    USER
-    INSTRUCTOR
+  SUPER_ADMIN
+  TENANT_ADMIN
+  MANAGER
+  USER
+  INSTRUCTOR
 }
 
 enum TenantStatus {
-    ACTIVE
-    SUSPENDED
-    TRIAL
-    EXPIRED
+  ACTIVE
+  SUSPENDED
+  TRIAL
+  EXPIRED
 }
 
 enum CourseStatus {
-    DRAFT
-    PUBLISHED
-    ARCHIVED
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
 enum Difficulty {
-    BEGINNER
-    INTERMEDIATE
-    ADVANCED
-    EXPERT
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
 }
 
 enum EnrollmentStatus {
-    NOT_STARTED
-    IN_PROGRESS
-    COMPLETED
-    FAILED
-    EXPIRED
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  EXPIRED
 }
 
 enum QuestionType {
-    MULTIPLE_CHOICE
-    TRUE_FALSE
-    SHORT_ANSWER
-    ESSAY
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  SHORT_ANSWER
+  ESSAY
 }
 
 enum NotificationType {
-    EMAIL
-    SMS
-    IN_APP
-    PUSH
+  EMAIL
+  SMS
+  IN_APP
+  PUSH
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
 }
 
 enum NotificationStatus {
-    PENDING
-    SENT
-    FAILED
-    READ
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  READ
 }
 
 enum WebhookStatus {
-    ACTIVE
-    INACTIVE
-    FAILED
+  ACTIVE
+  INACTIVE
+  FAILED
 }
 
 enum IntegrationType {
-    HRIS
-    LMS
-    BI_TOOL
-    SSO
-    WEBHOOK
+  HRIS
+  LMS
+  BI_TOOL
+  SSO
+  WEBHOOK
 }
 
 enum FileType {
-    IMAGE
-    VIDEO
-    DOCUMENT
-    SCORM
-    OTHER
+  IMAGE
+  VIDEO
+  DOCUMENT
+  SCORM
+  OTHER
 }
 
 enum TranscodingStatus {
-    PENDING
-    PROCESSING
-    COMPLETED
-    FAILED
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }
 
 enum ReportType {
-    EXECUTIVE_DASHBOARD
-    USER_PROGRESS
-    PHISHING_SIMULATION
-    RISK_ASSESSMENT
-    TRAINING_EFFECTIVENESS
-    DEPARTMENT_PERFORMANCE
-    COMPLIANCE_REPORT
-    CUSTOM
+  EXECUTIVE_DASHBOARD
+  USER_PROGRESS
+  PHISHING_SIMULATION
+  RISK_ASSESSMENT
+  TRAINING_EFFECTIVENESS
+  DEPARTMENT_PERFORMANCE
+  COMPLIANCE_REPORT
+  CUSTOM
 }
 
 enum ReportStatus {
-    PENDING
-    GENERATING
-    COMPLETED
-    FAILED
+  PENDING
+  GENERATING
+  COMPLETED
+  FAILED
 }
 
 enum ReportFormat {
-    PDF
-    EXCEL
-    CSV
-    JSON
+  PDF
+  EXCEL
+  CSV
+  JSON
 }
 
 enum ReportFrequency {
-    DAILY
-    WEEKLY
-    MONTHLY
-    QUARTERLY
-    YEARLY
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
 }
 
 enum ComplianceFramework {
-    GDPR
-    HIPAA
-    SOC2
-    ISO27001
-    NIST
-    PCI_DSS
-    CCPA
+  GDPR
+  HIPAA
+  SOC2
+  ISO27001
+  NIST
+  PCI_DSS
+  CCPA
 }
 
 // ============================================
@@ -146,84 +154,86 @@ enum ComplianceFramework {
 // ============================================
 
 model User {
-    id                String    @id @default(uuid())
-    tenantId          String
-    email             String
-    passwordHash      String
-    firstName         String
-    lastName          String
-    role              Role      @default(USER)
-    mfaEnabled        Boolean   @default(false)
-    mfaSecret         String?
-    emailVerified     Boolean   @default(false)
-    verificationToken String?
-    lastLoginAt       DateTime?
-    failedAttempts    Int       @default(0)
-    lockedUntil       DateTime?
-    avatar            String?
-    phoneNumber       String?
-    department        String?
-    departmentId      String?
-    position          String?
-    createdAt         DateTime  @default(now())
-    updatedAt         DateTime  @updatedAt
+  id                String    @id @default(uuid())
+  tenantId          String
+  email             String
+  passwordHash      String
+  firstName         String
+  lastName          String
+  role              Role      @default(USER)
+  mfaEnabled        Boolean   @default(false)
+  mfaSecret         String?
+  emailVerified     Boolean   @default(false)
+  verificationToken String?
+  lastLoginAt       DateTime?
+  failedAttempts    Int       @default(0)
+  lockedUntil       DateTime?
+  avatar            String?
+  phoneNumber       String?
+  department        String?
+  departmentId      String?
+  position          String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-    // Relations
-    tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-    departmentRel    Department?     @relation(fields: [departmentId], references: [id], onDelete: SetNull)
-    sessions         Session[]
-    auditLogs        AuditLog[]
-    enrollments      Enrollment[]
-    quizAttempts     QuizAttempt[]
-    riskScores       RiskScore[]
-    notifications    Notification[]
-    apiKeys          ApiKey[]
-    certificates     Certificate[]
-    phishingEvents   PhishingEvent[]
-    generatedReports Report[]        @relation("GeneratedReports")
+  // Relations
+  tenant                  Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  departmentRel           Department?              @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  sessions                Session[]
+  auditLogs               AuditLog[]
+  enrollments             Enrollment[]
+  quizAttempts            QuizAttempt[]
+  riskScores              RiskScore[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference[]
+  deviceTokens            DeviceToken[]
+  apiKeys                 ApiKey[]
+  certificates            Certificate[]
+  phishingEvents          PhishingEvent[]
+  generatedReports        Report[]                 @relation("GeneratedReports")
 
-    @@unique([tenantId, email])
-    @@index([tenantId])
-    @@index([email])
-    @@index([departmentId])
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@index([email])
+  @@index([departmentId])
 }
 
 model Session {
-    id           String   @id @default(uuid())
-    userId       String
-    token        String   @unique
-    refreshToken String   @unique
-    expiresAt    DateTime
-    ipAddress    String
-    userAgent    String
-    isRevoked    Boolean  @default(false)
-    createdAt    DateTime @default(now())
+  id           String   @id @default(uuid())
+  userId       String
+  token        String   @unique
+  refreshToken String   @unique
+  expiresAt    DateTime
+  ipAddress    String
+  userAgent    String
+  isRevoked    Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
-    // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-    @@index([token])
+  @@index([userId])
+  @@index([token])
 }
 
 model AuditLog {
-    id         String   @id @default(uuid())
-    userId     String?
-    tenantId   String
-    action     String
-    resource   String
-    resourceId String?
-    ipAddress  String?
-    userAgent  String?
-    metadata   Json?
-    createdAt  DateTime @default(now())
+  id         String   @id @default(uuid())
+  userId     String?
+  tenantId   String
+  action     String
+  resource   String
+  resourceId String?
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
 
-    // Relations
-    user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-    @@index([userId])
-    @@index([tenantId])
-    @@index([createdAt])
+  @@index([userId])
+  @@index([tenantId])
+  @@index([createdAt])
 }
 
 // ============================================
@@ -231,39 +241,39 @@ model AuditLog {
 // ============================================
 
 model Tenant {
-    id                    String       @id @default(uuid())
-    name                  String
-    slug                  String       @unique
-    description           String?
-    domain                String?      @unique
-    website               String?
-    contactEmail          String?
-    contactPhone          String?
-    status                TenantStatus @default(TRIAL)
-    logo                  String?
-    primaryColor          String?      @default("#3B82F6")
-    secondaryColor        String?      @default("#1E40AF")
-    favicon               String?
-    subscriptionId        String?
-    subscriptionPlan      String?      @default("TRIAL")
-    maxUsers              Int          @default(10)
-    subscriptionStartDate DateTime?
-    subscriptionEndDate   DateTime?
-    features              Json? // Feature flags
-    settings              Json? // Custom settings
-    trialEndsAt           DateTime?
-    createdAt             DateTime     @default(now())
-    updatedAt             DateTime     @updatedAt
+  id                    String       @id @default(uuid())
+  name                  String
+  slug                  String       @unique
+  description           String?
+  domain                String?      @unique
+  website               String?
+  contactEmail          String?
+  contactPhone          String?
+  status                TenantStatus @default(TRIAL)
+  logo                  String?
+  primaryColor          String?      @default("#3B82F6")
+  secondaryColor        String?      @default("#1E40AF")
+  favicon               String?
+  subscriptionId        String?
+  subscriptionPlan      String?      @default("TRIAL")
+  maxUsers              Int          @default(10)
+  subscriptionStartDate DateTime?
+  subscriptionEndDate   DateTime?
+  features              Json? // Feature flags
+  settings              Json? // Custom settings
+  trialEndsAt           DateTime?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
 
-    // Relations
-    users         User[]
-    courses       Course[]
-    learningPaths LearningPath[]
-    departments   Department[]
+  // Relations
+  users         User[]
+  courses       Course[]
+  learningPaths LearningPath[]
+  departments   Department[]
 
-    @@index([slug])
-    @@index([status])
-    @@index([subscriptionEndDate])
+  @@index([slug])
+  @@index([status])
+  @@index([subscriptionEndDate])
 }
 
 // ============================================
@@ -271,188 +281,188 @@ model Tenant {
 // ============================================
 
 model Course {
-    id                   String                @id @default(uuid())
-    tenantId             String
-    title                String
-    description          String?
-    category             String
-    difficulty           Difficulty            @default(BEGINNER)
-    duration             Int // minutes
-    durationMinutes      Int? // Alias for compatibility
-    scormPackage         String?
-    thumbnail            String?
-    status               CourseStatus          @default(DRAFT)
-    isActive             Boolean               @default(true)
-    version              Int                   @default(1)
-    prerequisites        String[] // Course IDs
-    tags                 String[]
-    passingScore         Int                   @default(70)
-    certificateTemplate  String?
-    complianceFrameworks ComplianceFramework[] // For compliance reporting
-    createdBy            String
-    publishedAt          DateTime?
-    createdAt            DateTime              @default(now())
-    updatedAt            DateTime              @updatedAt
+  id                   String                @id @default(uuid())
+  tenantId             String
+  title                String
+  description          String?
+  category             String
+  difficulty           Difficulty            @default(BEGINNER)
+  duration             Int // minutes
+  durationMinutes      Int? // Alias for compatibility
+  scormPackage         String?
+  thumbnail            String?
+  status               CourseStatus          @default(DRAFT)
+  isActive             Boolean               @default(true)
+  version              Int                   @default(1)
+  prerequisites        String[] // Course IDs
+  tags                 String[]
+  passingScore         Int                   @default(70)
+  certificateTemplate  String?
+  complianceFrameworks ComplianceFramework[] // For compliance reporting
+  createdBy            String
+  publishedAt          DateTime?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 
-    // Relations
-    tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-    modules     Module[]
-    enrollments Enrollment[]
-    quizzes     Quiz[]
-    pathCourses PathCourse[]
+  // Relations
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  modules     Module[]
+  enrollments Enrollment[]
+  quizzes     Quiz[]
+  pathCourses PathCourse[]
 
-    @@index([tenantId, status])
-    @@index([category])
+  @@index([tenantId, status])
+  @@index([category])
 }
 
 model Module {
-    id          String   @id @default(uuid())
-    courseId    String
-    title       String
-    description String?
-    order       Int
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+  id          String   @id @default(uuid())
+  courseId    String
+  title       String
+  description String?
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-    // Relations
-    course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
-    chapters Chapter[]
+  // Relations
+  course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  chapters Chapter[]
 
-    @@index([courseId])
+  @@index([courseId])
 }
 
 model Chapter {
-    id         String   @id @default(uuid())
-    moduleId   String
-    title      String
-    content    String?  @db.Text
-    videoUrl   String?
-    duration   Int? // minutes
-    order      Int
-    isRequired Boolean  @default(true)
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+  id         String   @id @default(uuid())
+  moduleId   String
+  title      String
+  content    String?  @db.Text
+  videoUrl   String?
+  duration   Int? // minutes
+  order      Int
+  isRequired Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-    // Relations
-    module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  // Relations
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
-    @@index([moduleId])
+  @@index([moduleId])
 }
 
 model Enrollment {
-    id             String           @id @default(uuid())
-    userId         String
-    courseId       String
-    tenantId       String
-    progress       Int              @default(0)
-    status         EnrollmentStatus @default(NOT_STARTED)
-    startedAt      DateTime         @default(now())
-    completedAt    DateTime?
-    dueDate        DateTime?
-    score          Float?
-    certificateUrl String?
-    createdAt      DateTime         @default(now())
-    updatedAt      DateTime         @updatedAt
+  id             String           @id @default(uuid())
+  userId         String
+  courseId       String
+  tenantId       String
+  progress       Int              @default(0)
+  status         EnrollmentStatus @default(NOT_STARTED)
+  startedAt      DateTime         @default(now())
+  completedAt    DateTime?
+  dueDate        DateTime?
+  score          Float?
+  certificateUrl String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
-    // Relations
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-    @@unique([userId, courseId])
-    @@index([userId])
-    @@index([courseId])
-    @@index([tenantId])
-    @@index([status])
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@index([tenantId])
+  @@index([status])
 }
 
 model Quiz {
-    id               String   @id @default(uuid())
-    courseId         String
-    title            String
-    description      String?
-    passingScore     Int      @default(70)
-    timeLimit        Int? // minutes
-    maxAttempts      Int      @default(3)
-    shuffleQuestions Boolean  @default(false)
-    showResults      Boolean  @default(true)
-    createdAt        DateTime @default(now())
-    updatedAt        DateTime @updatedAt
+  id               String   @id @default(uuid())
+  courseId         String
+  title            String
+  description      String?
+  passingScore     Int      @default(70)
+  timeLimit        Int? // minutes
+  maxAttempts      Int      @default(3)
+  shuffleQuestions Boolean  @default(false)
+  showResults      Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-    // Relations
-    course    Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
-    questions Question[]
-    attempts  QuizAttempt[]
+  // Relations
+  course    Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions Question[]
+  attempts  QuizAttempt[]
 
-    @@index([courseId])
+  @@index([courseId])
 }
 
 model Question {
-    id            String       @id @default(uuid())
-    quizId        String
-    type          QuestionType
-    question      String       @db.Text
-    options       Json? // For multiple choice
-    correctAnswer String       @db.Text
-    points        Int          @default(1)
-    explanation   String?      @db.Text
-    order         Int
-    createdAt     DateTime     @default(now())
-    updatedAt     DateTime     @updatedAt
+  id            String       @id @default(uuid())
+  quizId        String
+  type          QuestionType
+  question      String       @db.Text
+  options       Json? // For multiple choice
+  correctAnswer String       @db.Text
+  points        Int          @default(1)
+  explanation   String?      @db.Text
+  order         Int
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
-    // Relations
-    quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  // Relations
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
-    @@index([quizId])
+  @@index([quizId])
 }
 
 model QuizAttempt {
-    id          String   @id @default(uuid())
-    userId      String
-    quizId      String
-    score       Float
-    answers     Json // User's answers
-    isPassing   Boolean
-    completedAt DateTime @default(now())
+  id          String   @id @default(uuid())
+  userId      String
+  quizId      String
+  score       Float
+  answers     Json // User's answers
+  isPassing   Boolean
+  completedAt DateTime @default(now())
 
-    // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-    quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-    @@index([quizId])
+  @@index([userId])
+  @@index([quizId])
 }
 
 model LearningPath {
-    id          String   @id @default(uuid())
-    tenantId    String
-    title       String
-    description String?
-    thumbnail   String?
-    isRequired  Boolean  @default(false)
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+  id          String   @id @default(uuid())
+  tenantId    String
+  title       String
+  description String?
+  thumbnail   String?
+  isRequired  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-    // Relations
-    tenant  Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-    courses PathCourse[]
+  // Relations
+  tenant  Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  courses PathCourse[]
 
-    @@index([tenantId])
+  @@index([tenantId])
 }
 
 model PathCourse {
-    id         String  @id @default(uuid())
-    pathId     String
-    courseId   String
-    order      Int
-    isRequired Boolean @default(true)
+  id         String  @id @default(uuid())
+  pathId     String
+  courseId   String
+  order      Int
+  isRequired Boolean @default(true)
 
-    // Relations
-    path   LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
-    course Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  // Relations
+  path   LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  course Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-    @@unique([pathId, courseId])
-    @@index([pathId])
-    @@index([courseId])
+  @@unique([pathId, courseId])
+  @@index([pathId])
+  @@index([courseId])
 }
 
 // ============================================
@@ -460,33 +470,33 @@ model PathCourse {
 // ============================================
 
 model Media {
-    id                String             @id @default(uuid())
-    tenantId          String
-    filename          String
-    originalName      String
-    mimeType          String
-    size              Int // bytes
-    url               String
-    cdnUrl            String?
-    type              FileType
-    metadata          Json?
-    uploadedBy        String
-    transcodingStatus TranscodingStatus?
-    createdAt         DateTime           @default(now())
+  id                String             @id @default(uuid())
+  tenantId          String
+  filename          String
+  originalName      String
+  mimeType          String
+  size              Int // bytes
+  url               String
+  cdnUrl            String?
+  type              FileType
+  metadata          Json?
+  uploadedBy        String
+  transcodingStatus TranscodingStatus?
+  createdAt         DateTime           @default(now())
 
-    @@index([tenantId])
-    @@index([type])
+  @@index([tenantId])
+  @@index([type])
 }
 
 model ScormPackage {
-    id          String   @id @default(uuid())
-    courseId    String
-    version     String // 1.2 or 2004
-    manifest    Json
-    extractPath String
-    createdAt   DateTime @default(now())
+  id          String   @id @default(uuid())
+  courseId    String
+  version     String // 1.2 or 2004
+  manifest    Json
+  extractPath String
+  createdAt   DateTime @default(now())
 
-    @@index([courseId])
+  @@index([courseId])
 }
 
 // ============================================
@@ -494,93 +504,175 @@ model ScormPackage {
 // ============================================
 
 model RiskScore {
-    id                      String   @id @default(uuid())
-    userId                  String
-    tenantId                String
-    overallScore            Float // 0-100
-    phishingScore           Float
-    trainingCompletionScore Float
-    timeSinceTrainingScore  Float
-    quizPerformanceScore    Float
-    securityIncidentScore   Float
-    loginAnomalyScore       Float
-    calculatedAt            DateTime @default(now())
+  id                      String   @id @default(uuid())
+  userId                  String
+  tenantId                String
+  overallScore            Float // 0-100
+  phishingScore           Float
+  trainingCompletionScore Float
+  timeSinceTrainingScore  Float
+  quizPerformanceScore    Float
+  securityIncidentScore   Float
+  loginAnomalyScore       Float
+  calculatedAt            DateTime @default(now())
 
-    // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-    @@index([tenantId])
-    @@index([overallScore])
+  @@index([userId])
+  @@index([tenantId])
+  @@index([overallScore])
 }
 
 model PhishingSimulation {
-    id          String    @id @default(uuid())
-    tenantId    String
-    userId      String
-    campaignId  String
-    emailSent   DateTime
-    wasClicked  Boolean   @default(false)
-    wasReported Boolean   @default(false)
-    clickedAt   DateTime?
-    reportedAt  DateTime?
+  id          String    @id @default(uuid())
+  tenantId    String
+  userId      String
+  campaignId  String
+  emailSent   DateTime
+  wasClicked  Boolean   @default(false)
+  wasReported Boolean   @default(false)
+  clickedAt   DateTime?
+  reportedAt  DateTime?
 
-    @@index([tenantId])
-    @@index([userId])
-    @@index([campaignId])
+  @@index([tenantId])
+  @@index([userId])
+  @@index([campaignId])
 }
 
 model BehaviorPattern {
-    id          String   @id @default(uuid())
-    userId      String
-    tenantId    String
-    patternType String
-    metadata    Json
-    detectedAt  DateTime @default(now())
+  id          String   @id @default(uuid())
+  userId      String
+  tenantId    String
+  patternType String
+  metadata    Json
+  detectedAt  DateTime @default(now())
 
-    @@index([userId])
-    @@index([tenantId])
+  @@index([userId])
+  @@index([tenantId])
 }
 
 // ============================================
 // NOTIFICATION SERVICE MODELS
 // ============================================
 
+enum NotificationCategory {
+  COURSE_ENROLLMENT
+  COURSE_COMPLETION
+  CERTIFICATE_ISSUED
+  TRAINING_REMINDER
+  TRAINING_OVERDUE
+  PHISHING_SIMULATION
+  RISK_ALERT
+  COMPLIANCE_ALERT
+  REPORT_READY
+  SYSTEM_ALERT
+  COURSE
+  COMPLIANCE
+  SECURITY
+  SYSTEM
+  CUSTOM
+}
+
 model Notification {
-    id        String             @id @default(uuid())
-    userId    String
-    tenantId  String
-    type      NotificationType
-    status    NotificationStatus @default(PENDING)
-    title     String
-    message   String             @db.Text
-    metadata  Json?
-    sentAt    DateTime?
-    readAt    DateTime?
-    createdAt DateTime           @default(now())
+  id          String               @id @default(uuid())
+  userId      String
+  tenantId    String
+  type        NotificationType
+  status      NotificationStatus   @default(PENDING)
+  category    NotificationCategory @default(CUSTOM)
+  priority    NotificationPriority @default(MEDIUM)
+  title       String
+  message     String               @db.Text
+  actionUrl   String?
+  metadata    Json?
+  read        Boolean              @default(false)
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  readAt      DateTime?
+  createdAt   DateTime             @default(now())
 
-    // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-    @@index([tenantId])
-    @@index([status])
+  @@index([userId])
+  @@index([tenantId])
+  @@index([status])
+  @@index([read])
 }
 
 model NotificationTemplate {
-    id        String           @id @default(uuid())
-    tenantId  String?
-    name      String
-    type      NotificationType
-    subject   String?
-    template  String           @db.Text
-    variables String[]
-    isActive  Boolean          @default(true)
-    createdAt DateTime         @default(now())
-    updatedAt DateTime         @updatedAt
+  id          String               @id @default(uuid())
+  tenantId    String?
+  name        String
+  description String?
+  type        NotificationType
+  category    NotificationCategory @default(CUSTOM)
+  subject     String?
+  template    String               @db.Text
+  htmlBody    String?              @db.Text
+  variables   String[]
+  isActive    Boolean              @default(true)
+  createdBy   String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 
-    @@index([tenantId])
-    @@index([type])
+  @@index([tenantId])
+  @@index([type])
+}
+
+model NotificationPreference {
+  id                  String   @id @default(uuid())
+  userId              String
+  tenantId            String
+  emailEnabled        Boolean  @default(true)
+  smsEnabled          Boolean  @default(false)
+  pushEnabled         Boolean  @default(true)
+  inAppEnabled        Boolean  @default(true)
+  courseEnabled       Boolean  @default(true)
+  complianceEnabled   Boolean  @default(true)
+  securityEnabled     Boolean  @default(true)
+  systemEnabled       Boolean  @default(true)
+  categoryPreferences Json?    @default("{}")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@index([userId])
+  @@index([tenantId])
+}
+
+model DeviceToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tenantId  String
+  token     String   @unique
+  platform  String
+  deviceId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tenantId])
+}
+
+model Otp {
+  id          String   @id @default(uuid())
+  phoneNumber String
+  code        String
+  expiresAt   DateTime
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([phoneNumber])
+  @@index([code])
+  @@index([expiresAt])
 }
 
 // ============================================
@@ -588,54 +680,54 @@ model NotificationTemplate {
 // ============================================
 
 model ApiKey {
-    id          String    @id @default(uuid())
-    userId      String
-    tenantId    String
-    name        String
-    key         String    @unique
-    isActive    Boolean   @default(true)
-    lastUsedAt  DateTime?
-    expiresAt   DateTime?
-    permissions Json?
-    createdAt   DateTime  @default(now())
+  id          String    @id @default(uuid())
+  userId      String
+  tenantId    String
+  name        String
+  key         String    @unique
+  isActive    Boolean   @default(true)
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  permissions Json?
+  createdAt   DateTime  @default(now())
 
-    // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-    @@index([tenantId])
-    @@index([key])
+  @@index([userId])
+  @@index([tenantId])
+  @@index([key])
 }
 
 model Webhook {
-    id              String        @id @default(uuid())
-    tenantId        String
-    url             String
-    events          String[]
-    secret          String
-    status          WebhookStatus @default(ACTIVE)
-    lastTriggeredAt DateTime?
-    failureCount    Int           @default(0)
-    createdAt       DateTime      @default(now())
-    updatedAt       DateTime      @updatedAt
+  id              String        @id @default(uuid())
+  tenantId        String
+  url             String
+  events          String[]
+  secret          String
+  status          WebhookStatus @default(ACTIVE)
+  lastTriggeredAt DateTime?
+  failureCount    Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-    @@index([tenantId])
-    @@index([status])
+  @@index([tenantId])
+  @@index([status])
 }
 
 model Integration {
-    id         String          @id @default(uuid())
-    tenantId   String
-    type       IntegrationType
-    name       String
-    config     Json // Encrypted config data
-    isActive   Boolean         @default(true)
-    lastSyncAt DateTime?
-    createdAt  DateTime        @default(now())
-    updatedAt  DateTime        @updatedAt
+  id         String          @id @default(uuid())
+  tenantId   String
+  type       IntegrationType
+  name       String
+  config     Json // Encrypted config data
+  isActive   Boolean         @default(true)
+  lastSyncAt DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
-    @@index([tenantId])
-    @@index([type])
+  @@index([tenantId])
+  @@index([type])
 }
 
 // ============================================
@@ -643,129 +735,129 @@ model Integration {
 // ============================================
 
 model Report {
-    id          String       @id @default(uuid())
-    tenantId    String
-    type        ReportType
-    title       String
-    description String       @default("")
-    format      ReportFormat
-    status      ReportStatus @default(PENDING)
-    fileUrl     String?
-    fileSize    Int?
-    filters     Json         @default("{}")
-    metadata    Json         @default("{}")
-    generatedBy String
-    generatedAt DateTime?
-    createdAt   DateTime     @default(now())
-    updatedAt   DateTime     @updatedAt
+  id          String       @id @default(uuid())
+  tenantId    String
+  type        ReportType
+  title       String
+  description String       @default("")
+  format      ReportFormat
+  status      ReportStatus @default(PENDING)
+  fileUrl     String?
+  fileSize    Int?
+  filters     Json         @default("{}")
+  metadata    Json         @default("{}")
+  generatedBy String
+  generatedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
-    // Relations
-    generator User @relation("GeneratedReports", fields: [generatedBy], references: [id], onDelete: Cascade)
+  // Relations
+  generator User @relation("GeneratedReports", fields: [generatedBy], references: [id], onDelete: Cascade)
 
-    @@index([tenantId])
-    @@index([type])
-    @@index([status])
-    @@index([generatedBy])
+  @@index([tenantId])
+  @@index([type])
+  @@index([status])
+  @@index([generatedBy])
 }
 
 model ReportSchedule {
-    id          String          @id @default(uuid())
-    tenantId    String
-    name        String
-    description String          @default("")
-    reportType  ReportType
-    format      ReportFormat
-    frequency   ReportFrequency
-    dayOfWeek   Int?
-    dayOfMonth  Int?
-    time        String
-    recipients  String[]
-    filters     Json            @default("{}")
-    enabled     Boolean         @default(true)
-    lastRunAt   DateTime?
-    nextRunAt   DateTime?
-    createdBy   String
-    createdAt   DateTime        @default(now())
-    updatedAt   DateTime        @updatedAt
+  id          String          @id @default(uuid())
+  tenantId    String
+  name        String
+  description String          @default("")
+  reportType  ReportType
+  format      ReportFormat
+  frequency   ReportFrequency
+  dayOfWeek   Int?
+  dayOfMonth  Int?
+  time        String
+  recipients  String[]
+  filters     Json            @default("{}")
+  enabled     Boolean         @default(true)
+  lastRunAt   DateTime?
+  nextRunAt   DateTime?
+  createdBy   String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
-    @@index([tenantId])
-    @@index([enabled])
-    @@index([nextRunAt])
+  @@index([tenantId])
+  @@index([enabled])
+  @@index([nextRunAt])
 }
 
 model ReportTemplate {
-    id            String     @id @default(uuid())
-    tenantId      String
-    name          String
-    description   String     @default("")
-    type          ReportType
-    configuration Json
-    isDefault     Boolean    @default(false)
-    createdBy     String
-    createdAt     DateTime   @default(now())
-    updatedAt     DateTime   @updatedAt
+  id            String     @id @default(uuid())
+  tenantId      String
+  name          String
+  description   String     @default("")
+  type          ReportType
+  configuration Json
+  isDefault     Boolean    @default(false)
+  createdBy     String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
-    @@index([tenantId])
-    @@index([type])
+  @@index([tenantId])
+  @@index([type])
 }
 
 model Department {
-    id          String   @id @default(uuid())
-    tenantId    String
-    name        String
-    description String?
-    parentId    String?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  description String?
+  parentId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-    // Relations
-    tenant   Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-    parent   Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-    children Department[] @relation("DepartmentHierarchy")
-    users    User[]
+  // Relations
+  tenant   Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parent   Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Department[] @relation("DepartmentHierarchy")
+  users    User[]
 
-    @@index([tenantId])
-    @@index([parentId])
+  @@index([tenantId])
+  @@index([parentId])
 }
 
 model Certificate {
-    id             String    @id @default(uuid())
-    tenantId       String
-    userId         String
-    courseId       String?
-    title          String
-    description    String?
-    certificateUrl String
-    issuedAt       DateTime  @default(now())
-    expiresAt      DateTime?
-    metadata       Json?
+  id             String    @id @default(uuid())
+  tenantId       String
+  userId         String
+  courseId       String?
+  title          String
+  description    String?
+  certificateUrl String
+  issuedAt       DateTime  @default(now())
+  expiresAt      DateTime?
+  metadata       Json?
 
-    // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([tenantId])
-    @@index([userId])
-    @@index([issuedAt])
+  @@index([tenantId])
+  @@index([userId])
+  @@index([issuedAt])
 }
 
 model PhishingEvent {
-    id         String    @id @default(uuid())
-    tenantId   String
-    userId     String
-    campaignId String?
-    subject    String?
-    clicked    Boolean   @default(false)
-    reported   Boolean   @default(false)
-    sentAt     DateTime
-    clickedAt  DateTime?
-    reportedAt DateTime?
-    metadata   Json?
+  id         String    @id @default(uuid())
+  tenantId   String
+  userId     String
+  campaignId String?
+  subject    String?
+  clicked    Boolean   @default(false)
+  reported   Boolean   @default(false)
+  sentAt     DateTime
+  clickedAt  DateTime?
+  reportedAt DateTime?
+  metadata   Json?
 
-    // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([tenantId])
-    @@index([userId])
-    @@index([campaignId])
-    @@index([sentAt])
+  @@index([tenantId])
+  @@index([userId])
+  @@index([campaignId])
+  @@index([sentAt])
 }

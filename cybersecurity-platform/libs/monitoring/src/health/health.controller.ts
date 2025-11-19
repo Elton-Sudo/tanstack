@@ -1,11 +1,11 @@
 import { Public } from '@app/common';
 import { Controller, Get } from '@nestjs/common';
 import {
-    DiskHealthIndicator,
-    HealthCheck,
-    HealthCheckService,
-    HttpHealthIndicator,
-    MemoryHealthIndicator,
+  DiskHealthIndicator,
+  HealthCheck,
+  HealthCheckService,
+  HttpHealthIndicator,
+  MemoryHealthIndicator,
 } from '@nestjs/terminus';
 
 @Controller('health')
@@ -31,9 +31,7 @@ export class HealthController {
   @Public()
   @HealthCheck()
   ready() {
-    return this.health.check([
-      () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
-    ]);
+    return this.health.check([() => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024)]);
   }
 
   @Get('live')
