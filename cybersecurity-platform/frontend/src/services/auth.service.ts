@@ -1,17 +1,17 @@
 import { authServiceClient } from '@/lib/api-client';
+import { removeToken, setRefreshToken, setToken, setUser } from '@/lib/auth';
 import {
+  ChangePasswordRequest,
+  EnableMFAResponse,
+  ForgotPasswordRequest,
   LoginRequest,
   LoginResponse,
-  RegisterRequest,
   RefreshTokenRequest,
-  ChangePasswordRequest,
-  ForgotPasswordRequest,
+  RegisterRequest,
   ResetPasswordRequest,
-  EnableMFAResponse,
-  VerifyMFARequest,
   User,
+  VerifyMFARequest,
 } from '@/types/auth';
-import { setToken, setRefreshToken, setUser, removeToken } from '@/lib/auth';
 
 export const authService = {
   async login(data: LoginRequest): Promise<LoginResponse> {
@@ -39,6 +39,9 @@ export const authService = {
   async logout(): Promise<void> {
     try {
       await authServiceClient.post('/auth/logout');
+    } catch (error) {
+      // Log error but don't throw - always remove token locally
+      console.warn('Logout API call failed, removing token locally:', error);
     } finally {
       removeToken();
     }

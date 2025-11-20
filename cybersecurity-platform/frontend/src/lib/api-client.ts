@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'ax
 import { getToken, removeToken } from './auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const IS_MOCK_MODE = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_URL,
@@ -29,6 +30,16 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
+    // Handle network errors gracefully
+    if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+      console.warn('Backend service unavailable:', error.config?.baseURL);
+      // Don't redirect on network errors - let components handle it
+      return Promise.reject({
+        ...error,
+        message: 'Backend service is unavailable. Please check if services are running.',
+      });
+    }
+
     if (error.response?.status === 401) {
       removeToken();
       if (typeof window !== 'undefined') {
@@ -63,6 +74,15 @@ export const createServiceClient = (baseURL: string): AxiosInstance => {
   client.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
+      // Handle network errors gracefully
+      if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+        console.warn('Service unavailable:', error.config?.baseURL);
+        return Promise.reject({
+          ...error,
+          message: `Service unavailable: ${error.config?.baseURL}. Please ensure backend services are running.`,
+        });
+      }
+
       if (error.response?.status === 401) {
         removeToken();
         if (typeof window !== 'undefined') {

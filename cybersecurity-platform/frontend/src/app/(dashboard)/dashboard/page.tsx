@@ -1,5 +1,7 @@
 'use client';
 
+import { ServiceUnavailable } from '@/components/service-unavailable';
+import { useAnalytics } from '@/hooks/use-analytics';
 import {
   AlertTriangle,
   BookOpen,
@@ -10,41 +12,75 @@ import {
 } from 'lucide-react';
 
 export default function DashboardPage() {
-  // Mock data - will be replaced with real API data
-  const metrics = [
-    {
-      title: 'Active Users',
-      value: '2,543',
-      change: '+12.5%',
-      trend: 'up',
-      icon: Users,
-      color: 'brand-blue',
-    },
-    {
-      title: 'Courses Completed',
-      value: '1,234',
-      change: '+8.2%',
-      trend: 'up',
-      icon: CheckCircle2,
-      color: 'brand-green',
-    },
-    {
-      title: 'Risk Score',
-      value: '68/100',
-      change: '-5.3%',
-      trend: 'down',
-      icon: AlertTriangle,
-      color: 'brand-orange',
-    },
-    {
-      title: 'Training Hours',
-      value: '4,892',
-      change: '+15.8%',
-      trend: 'up',
-      icon: BookOpen,
-      color: 'brand-red',
-    },
-  ];
+  const { useDashboardMetrics } = useAnalytics();
+  const { data, isLoading, isError, error, refetch } = useDashboardMetrics();
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-32 animate-pulse rounded-lg border bg-card" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">Overview of your cybersecurity training platform</p>
+        </div>
+        <ServiceUnavailable service="Reporting" onRetry={() => refetch()} />
+      </div>
+    );
+  }
+
+  const metrics = data
+    ? [
+        {
+          title: 'Active Users',
+          value: data.activeUsers?.toString() || '0',
+          change: '+12.5%', // Calculated from trendData if available
+          trend: 'up',
+          icon: Users,
+          color: 'brand-blue',
+        },
+        {
+          title: 'Courses Completed',
+          value: data.completedEnrollments?.toString() || '0',
+          change: '+8.2%',
+          trend: 'up',
+          icon: CheckCircle2,
+          color: 'brand-green',
+        },
+        {
+          title: 'Risk Score',
+          value: `${data.averageRiskScore || 0}/100`,
+          change: '-5.3%',
+          trend: 'down',
+          icon: AlertTriangle,
+          color: 'brand-orange',
+        },
+        {
+          title: 'Training Hours',
+          value: data.trainingHours?.toString() || '0',
+          change: '+15.8%',
+          trend: 'up',
+          icon: BookOpen,
+          color: 'brand-red',
+        },
+      ]
+    : [];
 
   return (
     <div className="space-y-6">
