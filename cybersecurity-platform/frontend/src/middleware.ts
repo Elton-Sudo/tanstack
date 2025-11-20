@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { isAdmin, isTokenExpired } from './lib/jwt';
 
 const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
 const authRoutes = ['/login', '/register'];
@@ -24,6 +25,17 @@ export function middleware(request: NextRequest) {
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
   const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
 
+  // Check token expiration
+  if (token && isTokenExpired(token)) {
+    // Token is expired, redirect to login
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirect', pathname);
+    loginUrl.searchParams.set('expired', 'true');
+    const response = NextResponse.redirect(loginUrl);
+    response.cookies.delete('auth_token');
+    return response;
+  }
+
   // Redirect authenticated users away from auth pages
   if (isAuthenticated && isAuthRoute) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
@@ -36,10 +48,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Admin route protection (would need role check from token/cookie)
+  // Admin route protection with role validation from JWT token
   if (isAdminRoute && isAuthenticated) {
-    // TODO: Add role validation from JWT token
-    // For now, just allow authenticated users
+    if (!token || !isAdmin(token)) {
+      // User is not an admin, redirect to dashboard with error
+      const dashboardUrl = new URL('/dashboard', request.url);
+      dashboardUrl.searchParams.set('error', 'unauthorized');
+      return NextResponse.redirect(dashboardUrl);
+    }
   }
 
   return NextResponse.next();

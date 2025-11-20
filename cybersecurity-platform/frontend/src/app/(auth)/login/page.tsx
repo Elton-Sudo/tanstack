@@ -3,7 +3,7 @@
 import { LoginForm } from '@/components/auth/LoginForm';
 import { useAuthStore } from '@/store/auth.store';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 type LoginFormData = {
@@ -12,11 +12,21 @@ type LoginFormData = {
   rememberMe?: boolean;
 };
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((state) => state.login);
   const [loading, setLoading] = useState(false);
+
+  // Show session expired message if redirected from middleware
+  useEffect(() => {
+    if (searchParams.get('expired') === 'true') {
+      toast.error('Your session has expired. Please login again.');
+    }
+    if (searchParams.get('error') === 'unauthorized') {
+      toast.error('You do not have permission to access that page.');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (data: LoginFormData) => {
     setLoading(true);
@@ -37,4 +47,18 @@ export default function LoginPage() {
   };
 
   return <LoginForm onSubmit={handleSubmit} isPending={loading} />;
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
+  );
 }
