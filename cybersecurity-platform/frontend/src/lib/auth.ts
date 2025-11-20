@@ -10,6 +10,8 @@ export const getToken = (): string | null => {
 export const setToken = (token: string): void => {
   if (typeof window !== 'undefined') {
     localStorage.setItem(TOKEN_KEY, token);
+    // Set cookie for middleware
+    document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
   }
 };
 
@@ -29,6 +31,8 @@ export const removeToken = (): void => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    // Clear cookies
+    document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
   }
 };
 

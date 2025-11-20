@@ -42,7 +42,7 @@ apiClient.interceptors.response.use(
 // Service-specific clients
 export const createServiceClient = (baseURL: string): AxiosInstance => {
   const client = axios.create({
-    baseURL,
+    baseURL: `${baseURL}/api/v1`,
     timeout: 30000,
     headers: {
       'Content-Type': 'application/json',

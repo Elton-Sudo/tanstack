@@ -13,8 +13,8 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { user, logout } = useAuthStore();
   const router = useRouter();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/login');
   };
 

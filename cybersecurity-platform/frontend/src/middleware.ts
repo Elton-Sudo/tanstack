@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
 const authRoutes = ['/login', '/register'];
@@ -9,6 +9,15 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('auth_token')?.value;
   const isAuthenticated = !!token;
+
+  // Redirect root to dashboard
+  if (pathname === '/') {
+    if (isAuthenticated) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    } else {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
 
   // Check if current route is public
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));

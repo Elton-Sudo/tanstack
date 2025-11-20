@@ -55,9 +55,9 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const { email, password, tenantId } = loginDto;
 
-    // Find user
+    // Find user - if tenantId not provided, search by email only
     const user = await this.prisma.user.findFirst({
-      where: { email, tenantId },
+      where: tenantId ? { email, tenantId } : { email },
     });
 
     if (!user) {
