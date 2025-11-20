@@ -1,5 +1,11 @@
+/**
+ * Dashboard Home Page
+ * Main landing page after user login with analytics and metrics
+ */
+
 'use client';
 
+import { DashboardLayout } from '@/components/layout';
 import { ServiceUnavailable } from '@/components/service-unavailable';
 import { useAnalytics } from '@/hooks/use-analytics';
 import {
@@ -13,35 +19,30 @@ import {
 
 export default function DashboardPage() {
   const { useDashboardMetrics } = useAnalytics();
-  const { data, isLoading, isError, error, refetch } = useDashboardMetrics();
+  const { data, isLoading, isError, refetch } = useDashboardMetrics();
 
   // Show loading state
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <DashboardLayout title="Dashboard" subtitle="Loading...">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="h-32 animate-pulse rounded-lg border bg-card" />
           ))}
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   // Show error state
   if (isError) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Overview of your cybersecurity training platform</p>
-        </div>
+      <DashboardLayout
+        title="Dashboard"
+        subtitle="Overview of your cybersecurity training platform"
+      >
         <ServiceUnavailable service="Reporting" onRetry={() => refetch()} />
-      </div>
+      </DashboardLayout>
     );
   }
 
@@ -83,12 +84,7 @@ export default function DashboardPage() {
     : [];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Overview of your cybersecurity training platform</p>
-      </div>
-
+    <DashboardLayout title="Dashboard" subtitle="Overview of your cybersecurity training platform">
       {/* Metrics Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {metrics.map((metric) => {
@@ -127,7 +123,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* Training Progress Chart */}
         <div className="rounded-lg border bg-card p-6">
           <h3 className="text-lg font-semibold mb-4">Training Progress</h3>
@@ -146,7 +142,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity */}
-      <div className="rounded-lg border bg-card">
+      <div className="mt-6 rounded-lg border bg-card">
         <div className="border-b p-6">
           <h3 className="text-lg font-semibold">Recent Activity</h3>
         </div>
@@ -168,6 +164,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

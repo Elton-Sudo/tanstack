@@ -119,7 +119,7 @@ export function LoginForm({ onSubmit, isPending = false }: LoginFormProps) {
                   </label>
                 </div>
                 <Link
-                  href="/auth/forgot-password"
+                  href="/forgot-password"
                   className="text-sm text-primary hover:underline"
                   tabIndex={isPending ? -1 : 0}
                 >
@@ -138,7 +138,7 @@ export function LoginForm({ onSubmit, isPending = false }: LoginFormProps) {
             <p className="text-sm text-muted-foreground">
               Don't have an account?{' '}
               <Link
-                href="/auth/register"
+                href="/register"
                 className="text-primary hover:underline"
                 tabIndex={isPending ? -1 : 0}
               >

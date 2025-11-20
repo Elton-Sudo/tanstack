@@ -40,8 +40,12 @@ function LoginContent() {
       const redirectTo = searchParams.get('redirect') || '/dashboard';
       router.push(redirectTo);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to login. Please check your credentials.');
-    } finally {
+      console.error('Login error:', err);
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Failed to login. Please check your credentials.';
+      toast.error(errorMessage);
       setLoading(false);
     }
   };
