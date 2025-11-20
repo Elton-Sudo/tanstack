@@ -59,9 +59,7 @@ export function RiskGauge({ score, size = 'md', showLabel = true }: RiskGaugePro
         </div>
       </div>
       {showLabel && (
-        <p className={`mt-4 font-medium ${sizes[size].label}`}>
-          {getRiskLevel(score)}
-        </p>
+        <p className={`mt-4 font-medium ${sizes[size].label}`}>{getRiskLevel(score)}</p>
       )}
     </div>
   );

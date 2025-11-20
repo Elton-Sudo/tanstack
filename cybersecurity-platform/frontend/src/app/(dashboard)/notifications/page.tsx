@@ -1,8 +1,8 @@
 'use client';
 
-import { Bell, CheckCircle2, AlertTriangle, Info } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { AlertTriangle, Bell, CheckCircle2, Info } from 'lucide-react';
 
 export default function NotificationsPage() {
   // Mock data
@@ -68,12 +68,8 @@ export default function NotificationsPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="font-medium">{notification.title}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {notification.time}
-                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+                      <p className="text-xs text-muted-foreground mt-2">{notification.time}</p>
                     </div>
                     {!notification.read && <Badge variant="info">New</Badge>}
                   </div>

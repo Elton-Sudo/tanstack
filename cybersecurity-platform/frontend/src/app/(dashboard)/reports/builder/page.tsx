@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function ReportBuilderPage() {
   const [reportName, setReportName] = useState('');
@@ -21,9 +21,7 @@ export default function ReportBuilderPage() {
 
   const toggleMetric = (metricId: string) => {
     setSelectedMetrics((prev) =>
-      prev.includes(metricId)
-        ? prev.filter((id) => id !== metricId)
-        : [...prev, metricId]
+      prev.includes(metricId) ? prev.filter((id) => id !== metricId) : [...prev, metricId],
     );
   };
 
@@ -31,9 +29,7 @@ export default function ReportBuilderPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Report Builder</h1>
-        <p className="text-muted-foreground">
-          Create a custom report with the metrics you need
-        </p>
+        <p className="text-muted-foreground">Create a custom report with the metrics you need</p>
       </div>
 
       <Card>

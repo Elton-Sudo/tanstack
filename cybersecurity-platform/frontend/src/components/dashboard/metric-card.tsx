@@ -22,16 +22,10 @@ export function MetricCard({
 }: MetricCardProps) {
   return (
     <div
-      className={cn(
-        'rounded-lg border bg-card p-6 hover:shadow-lg transition-shadow',
-        className
-      )}
+      className={cn('rounded-lg border bg-card p-6 hover:shadow-lg transition-shadow', className)}
     >
       <div className="flex items-center justify-between mb-4">
-        <div
-          className="rounded-full p-3"
-          style={{ backgroundColor: `var(--${iconColor})15` }}
-        >
+        <div className="rounded-full p-3" style={{ backgroundColor: `var(--${iconColor})15` }}>
           <Icon className="h-5 w-5" style={{ color: `var(--${iconColor})` }} />
         </div>
         {change && (

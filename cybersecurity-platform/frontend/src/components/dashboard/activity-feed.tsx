@@ -33,21 +33,14 @@ export function ActivityFeed({ items, title = 'Recent Activity' }: ActivityFeedP
                   className="rounded-full p-2 flex-shrink-0"
                   style={{ backgroundColor: `var(--${iconColor})15` }}
                 >
-                  <Icon
-                    className="h-4 w-4"
-                    style={{ color: `var(--${iconColor})` }}
-                  />
+                  <Icon className="h-4 w-4" style={{ color: `var(--${iconColor})` }} />
                 </div>
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium">{item.title}</p>
                   {item.description && (
-                    <p className="text-xs text-muted-foreground">
-                      {item.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{item.description}</p>
                   )}
-                  <p className="text-xs text-muted-foreground">
-                    {item.timestamp}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{item.timestamp}</p>
                 </div>
               </div>
             );

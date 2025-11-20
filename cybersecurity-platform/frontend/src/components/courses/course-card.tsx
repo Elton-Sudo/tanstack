@@ -1,6 +1,6 @@
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, Star } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Clock, Star, Users } from 'lucide-react';
 import Link from 'next/link';
 
 export interface CourseCardData {
@@ -46,9 +46,7 @@ export function CourseCard({ course, onEnroll }: CourseCardProps) {
             <h3 className="text-lg font-semibold group-hover:text-brand-blue transition-colors">
               {course.title}
             </h3>
-            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-              {course.description}
-            </p>
+            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{course.description}</p>
           </div>
 
           <div className="flex items-center justify-between text-sm text-muted-foreground mt-auto">

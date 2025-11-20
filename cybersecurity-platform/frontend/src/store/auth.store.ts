@@ -1,6 +1,6 @@
 import { getUser, isAuthenticated, removeToken } from '@/lib/auth';
 import { authService } from '@/services/auth.service';
-import { LoginRequest, User } from '@/types/auth';
+import { User } from '@/types/auth';
 import { create } from 'zustand';
 
 interface AuthState {

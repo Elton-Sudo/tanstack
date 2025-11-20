@@ -75,11 +75,7 @@ style={{ color: 'var(--brand-blue)' }}
 import { DashboardLayout } from '@/components/layout';
 
 export default function MyPage() {
-  return (
-    <DashboardLayout>
-      {/* Your content */}
-    </DashboardLayout>
-  );
+  return <DashboardLayout>{/* Your content */}</DashboardLayout>;
 }
 ```
 
@@ -133,27 +129,29 @@ import { CourseCard } from '@/components/courses';
 <CourseCard
   course={{
     id: 1,
-    title: "Phishing Awareness Training",
-    description: "Learn to identify and prevent phishing attacks",
-    duration: "2 hours",
+    title: 'Phishing Awareness Training',
+    description: 'Learn to identify and prevent phishing attacks',
+    duration: '2 hours',
     enrolled: 245,
     rating: 4.8,
-    level: "Beginner",
-    category: "Email Security"
+    level: 'Beginner',
+    category: 'Email Security',
   }}
   onEnroll={(id) => console.log('Enroll:', id)}
-/>
+/>;
 ```
 
 ## 🎯 Page Routes
 
 ### Public Routes
+
 - `/` - Home (redirects to `/dashboard`)
 - `/login` - Login page
 - `/register` - Registration page
 - `/forgot-password` - Password reset
 
 ### Protected Routes
+
 - `/dashboard` - Main dashboard
 - `/courses` - Course catalog
 - `/my-courses` - User's enrolled courses
@@ -165,6 +163,7 @@ import { CourseCard } from '@/components/courses';
 - `/profile` - User profile (to be implemented)
 
 ### Admin Routes
+
 - `/admin/users` - User management (to be implemented)
 - `/admin/courses` - Course management (to be implemented)
 - `/admin/settings` - Tenant settings (to be implemented)
@@ -174,6 +173,7 @@ import { CourseCard } from '@/components/courses';
 ### Adding a New Page
 
 1. Create the page file in the appropriate route group:
+
 ```bash
 # Protected page
 touch src/app/(dashboard)/my-page/page.tsx
@@ -183,6 +183,7 @@ touch src/app/(auth)/my-auth-page/page.tsx
 ```
 
 2. Use the layout automatically:
+
 ```tsx
 // src/app/(dashboard)/my-page/page.tsx
 export default function MyPage() {
@@ -281,11 +282,13 @@ import { cn } from '@/lib/utils';
 ## 🔗 API Integration (Coming Soon)
 
 API services are already set up in `src/services/`:
+
 - `auth.service.ts` - Authentication
 - `course.service.ts` - Courses
 - `analytics.service.ts` - Analytics
 
 Example usage:
+
 ```tsx
 import { authService } from '@/services/auth.service';
 
@@ -298,16 +301,19 @@ const handleLogin = async () => {
 ## 🐛 Common Issues
 
 ### Module not found errors
+
 ```bash
 npm install
 ```
 
 ### TypeScript errors
+
 ```bash
 npm run type-check
 ```
 
 ### Port already in use
+
 ```bash
 # Kill the process using port 3000
 lsof -ti:3000 | xargs kill -9

@@ -31,16 +31,10 @@ export function ProgressTracker({
           <span className="font-medium">
             {current} / {total}
           </span>
-          {showPercentage && (
-            <span className="text-muted-foreground">({percentage}%)</span>
-          )}
+          {showPercentage && <span className="text-muted-foreground">({percentage}%)</span>}
         </div>
       </div>
-      <Progress
-        value={current}
-        max={total}
-        indicatorClassName={getProgressColor(percentage)}
-      />
+      <Progress value={current} max={total} indicatorClassName={getProgressColor(percentage)} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface StatsGridProps {
   stats: {
@@ -31,9 +31,7 @@ export function StatsGrid({ stats, columns = 3 }: StatsGridProps) {
                 <div
                   className="rounded-full p-3"
                   style={{
-                    backgroundColor: stat.color
-                      ? `var(--${stat.color})15`
-                      : 'var(--brand-blue)15',
+                    backgroundColor: stat.color ? `var(--${stat.color})15` : 'var(--brand-blue)15',
                   }}
                 >
                   {stat.icon}

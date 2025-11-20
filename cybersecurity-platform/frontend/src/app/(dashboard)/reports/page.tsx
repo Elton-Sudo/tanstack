@@ -1,9 +1,9 @@
 'use client';
 
-import { FileText, Download, Calendar, Filter } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calendar, Download, FileText, Filter } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ReportsPage() {

@@ -1,10 +1,10 @@
 'use client';
 
-import { User, Mail, Building, Calendar, Shield } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Building, Mail, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfilePage() {
