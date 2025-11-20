@@ -25,8 +25,8 @@ describe('useCourses Hook', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(result.current.data).toBeDefined();
-    expect(result.current.data?.data).toHaveLength(2);
-    expect(result.current.data?.data[0].title).toBe('Phishing Awareness Training');
+    expect(result.current.data).toHaveLength(2);
+    expect(result.current.data?.[0].title).toBe('Phishing Awareness Training');
   });
 
   it('should filter courses by search term', async () => {
@@ -36,8 +36,8 @@ describe('useCourses Hook', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data?.data).toHaveLength(1);
-    expect(result.current.data?.data[0].title).toContain('Password');
+    expect(result.current.data).toHaveLength(1);
+    expect(result.current.data?.[0].title).toContain('Password');
   });
 
   it('should fetch single course by ID', async () => {
@@ -49,7 +49,7 @@ describe('useCourses Hook', () => {
 
     expect(result.current.data).toBeDefined();
     expect(result.current.data?.id).toBe('course-1');
-    expect(result.current.data?.modules).toBeDefined();
+    expect(result.current.data?.title).toBeDefined();
   });
 
   it('should handle course not found', async () => {

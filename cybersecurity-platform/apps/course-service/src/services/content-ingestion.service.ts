@@ -52,15 +52,20 @@ export class ContentIngestionService {
    * Create the main cybersecurity awareness course
    */
   private async createCybersecurityCourse(tenantId: string, createdBy: string) {
-    return await this.prisma.course.upsert({
+    // Check if course already exists
+    const existing = await this.prisma.course.findFirst({
       where: {
-        tenantId_title: {
-          tenantId,
-          title: 'Cybersecurity and Information Compliance Training',
-        },
+        tenantId,
+        title: 'Cybersecurity and Information Compliance Training',
       },
-      update: {},
-      create: {
+    });
+
+    if (existing) {
+      return existing;
+    }
+
+    return await this.prisma.course.create({
+      data: {
         tenantId,
         title: 'Cybersecurity and Information Compliance Training',
         description:
@@ -956,7 +961,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter1QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'Why is cybersecurity awareness important for every government employee?',
         options: {
           a: 'Because only the IT department is responsible for security.',
@@ -971,7 +976,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           "Cybersecurity is everyone's responsibility. Even non-technical staff can cause or prevent breaches through their daily actions and decisions.",
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'Which of the following incidents best illustrates the impact of a cyber attack on a South African government institution?',
         options: {
@@ -987,7 +992,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'The GEPF ransomware attack in 2024 forced offices to close for six days, demonstrating the severe real-world impact of cyber attacks on government services.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'What is the Protection of Personal Information Act (POPIA)?',
         options: {
           a: 'A policy that mandates how the government purchases IT equipment.',
@@ -1007,7 +1012,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter2QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'Phishing is:',
         options: {
           a: 'A technique to test network speeds on Wi-Fi.',
@@ -1022,7 +1027,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Phishing is a social engineering attack that uses fraudulent emails or messages to trick victims into revealing sensitive information or downloading malware.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'Which of the following is not an example of social engineering?',
         options: {
           a: 'An email that tricks you into clicking a malicious link.',
@@ -1037,7 +1042,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           "Social engineering relies on human interaction and manipulation. Exploiting a software vulnerability is a technical attack that doesn't involve tricking people.",
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'What makes ransomware especially disruptive for government offices?',
         options: {
           a: 'It encrypts files and can halt access to important data until a ransom is paid.',
@@ -1052,7 +1057,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Ransomware encrypts files and prevents access to critical data and systems until a ransom is paid, causing major service disruptions.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'Why are weak or reused passwords a security risk?',
         options: {
           a: 'They are harder for employees to remember.',
@@ -1072,7 +1077,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter3QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'You receive an email from an unknown address claiming to be your bank, asking you to click a link to verify your account. What should you do first?',
         options: {
@@ -1088,7 +1093,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Never click links in unexpected emails. Always verify through official channels like calling the organization directly using a known phone number.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'Which of these is a red flag that an email might be a phishing attempt?',
         options: {
           a: 'The email has a professional signature and a recognizable sender.',
@@ -1103,7 +1108,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Phishing emails commonly contain spelling mistakes, urgent/threatening language, and requests for sensitive information like passwords or account details.',
       },
       {
-        type: 'TRUE_FALSE',
+        type: 'TRUE_FALSE' as const,
         question:
           "It is safe to enable macros in an attachment from an external sender as long as the email says it's important.",
         options: {
@@ -1118,7 +1123,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Never enable macros on attachments from external or untrusted sources. Macros can contain malicious code. Always verify the source first.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'Your boss emails you (from their real address) asking for a transfer of funds to a new vendor account ASAP. It sounds urgent and unusual. What is the best course of action?',
         options: {
@@ -1139,7 +1144,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter4QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           "When browsing the web, you notice the URL of a site starts with http:// (not https) and there's no padlock icon. What does this mean, and what should you do?",
         options: {
@@ -1155,7 +1160,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'HTTP (without the S) means the connection is not encrypted. Never enter sensitive information on non-HTTPS sites as the data can be intercepted.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'What is a safe practice when using search engines at work?',
         options: {
           a: 'Click on results immediately; search providers block all bad sites.',
@@ -1170,7 +1175,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'SEO poisoning can place malicious sites in search results. Always verify domains and sources before clicking, especially for government or sensitive sites.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'Which of the following actions can improve your web browsing security?',
         options: {
           a: 'Keeping your browser updated to the latest version.',
@@ -1190,7 +1195,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter5QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'What is one of the most effective ways to prevent malware infections on your work PC?',
         options: {
@@ -1206,7 +1211,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Keeping your OS and software updated with security patches closes vulnerabilities that malware could exploit.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'You find a USB flash drive in the parking lot and it has no labels. What should you do?',
         options: {
@@ -1222,7 +1227,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Unknown USB drives can contain malware. They\'re sometimes left intentionally as "bait." Always give them to IT/security for safe inspection.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'Which of the following is a good practice for mobile devices used for work?',
         options: {
           a: 'Not setting any lock on your phone for convenience.',
@@ -1242,7 +1247,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter6QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'Why is it risky to use public Wi-Fi (like in a caf√© or airport) for work purposes?',
         options: {
@@ -1258,7 +1263,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Public Wi-Fi networks are not secure. Attackers can intercept data or set up fake hotspots. Always use VPN and avoid sensitive activities on public Wi-Fi.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'What should you do to secure your home Wi-Fi if you use it for remote work?',
         options: {
           a: "Keep the default router name and password so you don't forget them.",
@@ -1273,7 +1278,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Strong WPA2/WPA3 encryption and changing the default password are essential to prevent unauthorized access to your home network.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           "Is it okay to connect your personal smartphone or tablet to the office's secure Wi-Fi network?",
         options: {
@@ -1294,7 +1299,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter7QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'What is a key requirement if you use your personal smartphone for work email?',
         options: {
           a: 'You must let your colleagues borrow it any time.',
@@ -1309,7 +1314,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'BYOD devices must have strong security and you must accept that IT may need to enforce policies or remotely wipe work data if the device is lost.',
       },
       {
-        type: 'TRUE_FALSE',
+        type: 'TRUE_FALSE' as const,
         question:
           "If your personal laptop, which has some work files on it, gets stolen, it's not necessary to inform your employer since it's not a work-issued device.",
         options: {
@@ -1324,7 +1329,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Any device with work data must be reported if lost or stolen so IT can protect sensitive information through remote wipe or access revocation.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'Which of the following is not a good BYOD practice?',
         options: {
           a: "Enrolling your device in the company's device management program if required.",
@@ -1344,7 +1349,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter8QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'Which of the following is considered personal information under POPIA and thus must be protected?',
         options: {
@@ -1360,7 +1365,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'POPIA broadly defines personal information to include identifiers, sensitive data, and even information about juristic persons (companies).',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'POPIA requires organizations to take reasonable measures to secure personal data. In practice, what does this mean for you as an employee?',
         options: {
@@ -1376,7 +1381,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'POPIA Section 19 requires appropriate security measures. All employees must follow security protocols to protect personal information.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'The Cybercrimes Act makes which of the following a criminal offense?',
         options: {
           a: "Hacking into someone's account without permission.",
@@ -1391,7 +1396,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'The Cybercrimes Act criminalizes unauthorized access to systems, malware distribution, identity theft, and online impersonation.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'If a laptop containing personal information of citizens is stolen and you suspect the data might be compromised, what does POPIA mandate?',
         options: {
@@ -1412,7 +1417,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter9QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'What is the first thing you should do if you realize you may have accidentally downloaded malware or fallen for a phishing scam at work?',
         options: {
@@ -1428,7 +1433,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Immediate reporting allows IT to contain the incident quickly by resetting credentials, scanning systems, and alerting others.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'Why is prompt reporting of security incidents so important?',
         options: {
           a: 'Because it allows quick action to limit damage (like changing passwords, isolating systems) and helps fulfill legal obligations to notify about breaches.',
@@ -1443,7 +1448,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Quick reporting minimizes damage, meets POPIA notification requirements, and allows proper incident response.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question: 'You lost a USB drive that contained confidential data. What should you do?',
         options: {
           a: "Nothing, if no one knows, it's fine.",
@@ -1463,7 +1468,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
   private getChapter10QuizQuestions() {
     return [
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'After completing this training, what is the best description of your role in cybersecurity as a government employee?',
         options: {
@@ -1479,7 +1484,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Every employee is part of the cybersecurity defense. Your actions and vigilance are crucial to protecting the organization.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           "If you're unsure about whether an email is legitimate or how to handle a security situation, what should you do?",
         options: {
@@ -1495,7 +1500,7 @@ With knowledgeable and alert staff like you, we can ensure that our department ‚
           'Always ask when unsure. There are no "dumb questions" in security. It\'s better to clarify than to make a potentially dangerous assumption.',
       },
       {
-        type: 'MULTIPLE_CHOICE',
+        type: 'MULTIPLE_CHOICE' as const,
         question:
           'How can you help build a culture of security awareness in your workplace after completing this training?',
         options: {

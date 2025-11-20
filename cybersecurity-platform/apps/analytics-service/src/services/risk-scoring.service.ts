@@ -75,15 +75,16 @@ export class RiskScoringService {
 
     const riskLevel = this.determineRiskLevel(overallScore);
     const recommendations = this.generateRecommendations({
+      overallScore,
       phishingScore,
       trainingCompletionScore,
       timeSinceTrainingScore,
       quizPerformanceScore,
       securityIncidentScore,
       loginAnomalyScore,
-      overallScore,
       riskLevel,
-    } as RiskScoreResult);
+      recommendations: [], // Will be populated
+    });
 
     // Store the risk score
     await this.storeRiskScore(tenantId, userId, {
@@ -377,12 +378,22 @@ export class RiskScoringService {
   /**
    * Store risk score in database
    */
-  private async storeRiskScore(tenantId: string, userId: string, scores: RiskScoreComponents) {
+  private async storeRiskScore(
+    tenantId: string,
+    userId: string,
+    scores: RiskScoreComponents & { overallScore: number },
+  ) {
     await this.prisma.riskScore.create({
       data: {
         tenantId,
         userId,
-        ...scores,
+        overallScore: scores.overallScore,
+        phishingScore: scores.phishingScore,
+        trainingCompletionScore: scores.trainingCompletionScore,
+        timeSinceTrainingScore: scores.timeSinceTrainingScore,
+        quizPerformanceScore: scores.quizPerformanceScore,
+        securityIncidentScore: scores.securityIncidentScore,
+        loginAnomalyScore: scores.loginAnomalyScore,
         calculatedAt: new Date(),
       },
     });

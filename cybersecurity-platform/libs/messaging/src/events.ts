@@ -44,4 +44,9 @@ export const EVENTS = {
   // Notification events
   NOTIFICATION_SENT: 'notification.sent',
   EMAIL_SENT: 'email.sent',
+
+  // Phishing simulation events
+  PHISHING_SIMULATION_STARTED: 'phishing.simulation.started',
+  PHISHING_CLICKED: 'phishing.clicked',
+  PHISHING_REPORTED: 'phishing.reported',
 };
