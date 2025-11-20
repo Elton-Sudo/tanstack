@@ -1,5 +1,6 @@
-import { getUser, isAuthenticated } from '@/lib/auth';
-import { User } from '@/types/auth';
+import { getUser, isAuthenticated, removeToken } from '@/lib/auth';
+import { authService } from '@/services/auth.service';
+import { LoginRequest, User } from '@/types/auth';
 import { create } from 'zustand';
 
 interface AuthState {
@@ -8,6 +9,8 @@ interface AuthState {
   setUser: (user: User | null) => void;
   clearAuth: () => void;
   initialize: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -32,6 +35,23 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({
       user: authenticated ? user : null,
       isAuthenticated: authenticated,
+    });
+  },
+
+  login: async (email: string, password: string) => {
+    const response = await authService.login({ email, password });
+    set({
+      user: response.user,
+      isAuthenticated: true,
+    });
+  },
+
+  logout: async () => {
+    await authService.logout();
+    removeToken();
+    set({
+      user: null,
+      isAuthenticated: false,
     });
   },
 }));

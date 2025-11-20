@@ -49,11 +49,18 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // Brand colors
+        brand: {
+          blue: '#3FA9DD',
+          green: '#8DC63F',
+          orange: '#F7B239',
+          red: '#E55934',
+        },
         chart: {
-          1: 'hsl(var(--chart-1))',
-          2: 'hsl(var(--chart-2))',
-          3: 'hsl(var(--chart-3))',
-          4: 'hsl(var(--chart-4))',
+          1: '#3FA9DD', // Blue
+          2: '#8DC63F', // Green
+          3: '#F7B239', // Orange
+          4: '#E55934', // Red
           5: 'hsl(var(--chart-5))',
         },
       },
