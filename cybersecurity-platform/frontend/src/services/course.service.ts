@@ -3,7 +3,11 @@ import { Course, Enrollment, Module, Quiz, QuizAttempt, LearningPath } from '@/t
 
 export const courseService = {
   // Courses
-  async getCourses(params?: { category?: string; difficulty?: string; status?: string }): Promise<Course[]> {
+  async getCourses(params?: {
+    category?: string;
+    difficulty?: string;
+    status?: string;
+  }): Promise<Course[]> {
     const response = await courseServiceClient.get<Course[]>('/courses', { params });
     return response.data;
   },
@@ -55,9 +59,12 @@ export const courseService = {
   },
 
   async updateProgress(enrollmentId: string, progress: number): Promise<Enrollment> {
-    const response = await courseServiceClient.put<Enrollment>(`/enrollments/${enrollmentId}/progress`, {
-      progress,
-    });
+    const response = await courseServiceClient.put<Enrollment>(
+      `/enrollments/${enrollmentId}/progress`,
+      {
+        progress,
+      },
+    );
     return response.data;
   },
 

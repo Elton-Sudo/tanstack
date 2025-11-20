@@ -1,5 +1,8 @@
 'use client';
 
+import { Logo } from '@/components/shared/Logo';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
+import { useTenantBranding } from '@/hooks/useTenantBranding';
 import { useAuthStore } from '@/store/auth.store';
 import { Bell, LogOut, Menu, Settings, User } from 'lucide-react';
 import Link from 'next/link';
@@ -12,6 +15,7 @@ interface HeaderProps {
 export function Header({ onMenuClick }: HeaderProps) {
   const { user, logout } = useAuthStore();
   const router = useRouter();
+  const { logo, name } = useTenantBranding();
 
   const handleLogout = async () => {
     await logout();
@@ -32,12 +36,11 @@ export function Header({ onMenuClick }: HeaderProps) {
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <Link href="/dashboard" className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1">
-              <div className="h-8 w-8 rounded-full bg-brand-blue flex items-center justify-center text-white font-bold">
-                C
-              </div>
-              <span className="hidden font-bold sm:inline-block">CyberSec Platform</span>
-            </div>
+            {logo ? (
+              <img src={logo} alt={name || 'Logo'} className="h-8 w-auto" />
+            ) : (
+              <Logo width={140} height={32} href="/dashboard" />
+            )}
           </Link>
         </div>
 
@@ -45,11 +48,14 @@ export function Header({ onMenuClick }: HeaderProps) {
         <div className="flex-1" />
 
         {/* Right side actions */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 md:space-x-4">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* Notifications */}
           <button className="relative rounded-full p-2 hover:bg-accent">
             <Bell className="h-5 w-5" />
-            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-brand-red" />
+            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />
           </button>
 
           {/* User menu */}

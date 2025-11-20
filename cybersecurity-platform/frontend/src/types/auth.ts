@@ -17,6 +17,15 @@ export interface User {
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+  tenant?: {
+    id: string;
+    name: string;
+    slug: string;
+    logo?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    favicon?: string;
+  };
 }
 
 export interface LoginRequest {

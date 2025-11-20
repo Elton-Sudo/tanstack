@@ -1,8 +1,8 @@
 'use client';
 
+import { ThemeProvider } from '@/lib/theme/theme-provider';
 import { useAuthStore } from '@/store/auth.store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 
@@ -27,7 +27,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <ThemeProvider
+        defaultTheme="system"
+        storageKey="swiif-theme"
+        brandColors={{
+          primary: '#3B82F6',
+          secondary: '#1E40AF',
+        }}
+      >
         {children}
         <Toaster position="top-right" />
       </ThemeProvider>
