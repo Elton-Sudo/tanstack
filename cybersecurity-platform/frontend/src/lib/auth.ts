@@ -2,6 +2,30 @@ const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 const USER_KEY = 'user_data';
 
+/**
+ * Decode JWT token to get expiration time
+ */
+const getTokenExpiration = (token: string): number => {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return 60 * 60; // Default to 1 hour
+
+    const payload = parts[1];
+    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+
+    if (decoded.exp) {
+      // exp is in seconds, calculate max-age in seconds
+      const maxAge = decoded.exp - Math.floor(Date.now() / 1000);
+      return maxAge > 0 ? maxAge : 60 * 60; // Default to 1 hour if expired
+    }
+
+    return 60 * 60; // Default to 1 hour
+  } catch (error) {
+    console.error('Failed to decode token expiration:', error);
+    return 60 * 60; // Default to 1 hour
+  }
+};
+
 export const getToken = (): string | null => {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem(TOKEN_KEY);
@@ -10,8 +34,24 @@ export const getToken = (): string | null => {
 export const setToken = (token: string): void => {
   if (typeof window !== 'undefined') {
     localStorage.setItem(TOKEN_KEY, token);
-    // Set cookie for middleware
-    document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+    // Set cookie for middleware with expiration matching JWT token
+    const maxAge = getTokenExpiration(token);
+
+    // Debug: Log token details
+    try {
+      const parts = token.split('.');
+      const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+      console.log('Token set:', {
+        exp: new Date(payload.exp * 1000).toISOString(),
+        now: new Date().toISOString(),
+        maxAge,
+        isExpired: payload.exp * 1000 < Date.now(),
+      });
+    } catch (e) {
+      console.error('Failed to parse token for debugging', e);
+    }
+
+    document.cookie = `auth_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
   }
 };
 

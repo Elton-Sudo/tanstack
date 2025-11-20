@@ -34,15 +34,18 @@ export function decodeJWT(token: string): JWTPayload | null {
 
 /**
  * Check if a JWT token is expired
+ * @param gracePeriodSeconds - Grace period in seconds to account for clock skew (default: 30)
  */
-export function isTokenExpired(token: string): boolean {
+export function isTokenExpired(token: string, gracePeriodSeconds: number = 30): boolean {
   const payload = decodeJWT(token);
   if (!payload || !payload.exp) {
     return true;
   }
 
   // exp is in seconds, Date.now() is in milliseconds
-  return payload.exp * 1000 < Date.now();
+  // Add grace period to account for clock skew and timing issues
+  const expirationWithGrace = (payload.exp + gracePeriodSeconds) * 1000;
+  return expirationWithGrace < Date.now();
 }
 
 /**

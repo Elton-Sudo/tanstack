@@ -25,20 +25,23 @@ export function middleware(request: NextRequest) {
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
   const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
 
-  // Check token expiration
-  if (token && isTokenExpired(token)) {
-    // Token is expired, redirect to login
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    loginUrl.searchParams.set('expired', 'true');
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.delete('auth_token');
-    return response;
-  }
-
   // Redirect authenticated users away from auth pages
   if (isAuthenticated && isAuthRoute) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // For protected routes, check token expiration
+  if (token && !isPublicRoute) {
+    if (isTokenExpired(token, 60)) {
+      // Token is expired (with 60 second grace period), redirect to login
+      console.log('Token expired, redirecting to login');
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      loginUrl.searchParams.set('expired', 'true');
+      const response = NextResponse.redirect(loginUrl);
+      response.cookies.delete('auth_token');
+      return response;
+    }
   }
 
   // Redirect unauthenticated users to login

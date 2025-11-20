@@ -2,7 +2,7 @@
 
 import { LoginForm } from '@/components/auth/LoginForm';
 import { useAuthStore } from '@/store/auth.store';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -13,7 +13,6 @@ type LoginFormData = {
 };
 
 function LoginContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((state) => state.login);
   const [loading, setLoading] = useState(false);
@@ -36,9 +35,15 @@ function LoginContent() {
 
       toast.success('Welcome back!');
 
+      // Small delay to ensure cookie is set before navigation
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       // Redirect to the intended page or dashboard
       const redirectTo = searchParams.get('redirect') || '/dashboard';
-      router.push(redirectTo);
+
+      // Use window.location.href for a full page reload to ensure cookie is set
+      // This prevents race condition where middleware checks cookie before it's set
+      window.location.href = redirectTo;
     } catch (err: any) {
       console.error('Login error:', err);
       const errorMessage =
