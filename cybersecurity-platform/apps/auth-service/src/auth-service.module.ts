@@ -26,7 +26,10 @@ import { SsoService } from './services/sso.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: [
+        '../../.env', // project root .env
+        '.env', // local service .env
+      ],
     }),
     ThrottlerModule.forRoot([
       {

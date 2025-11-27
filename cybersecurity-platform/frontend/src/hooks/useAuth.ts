@@ -1,4 +1,5 @@
 import { authApi } from '@/lib/api/endpoints/auth';
+import { removeToken, setRefreshToken, setToken } from '@/lib/auth';
 import { useAuthStore } from '@/store/auth.store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -24,7 +25,7 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.requiresMfa) {
         // Store session ID for MFA verification
         if (data.sessionId) {
@@ -34,8 +35,8 @@ export function useLogin() {
         toast.success('Please enter your MFA code');
       } else {
         // Store tokens
-        localStorage.setItem('access_token', data.accessToken);
-        localStorage.setItem('refresh_token', data.refreshToken);
+        setToken(data.token);
+        setRefreshToken(data.refreshToken);
 
         // Update auth store
         setUser(data.user as any);
@@ -44,6 +45,8 @@ export function useLogin() {
         queryClient.setQueryData(authKeys.session, data.user);
 
         toast.success('Welcome back!');
+        // Small delay to ensure cookie is available for middleware checks
+        await new Promise((resolve) => setTimeout(resolve, 100));
         router.push('/dashboard');
       }
     },
@@ -64,10 +67,10 @@ export function useVerifyMfa() {
 
   return useMutation({
     mutationFn: authApi.verifyMfa,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Store tokens
-      localStorage.setItem('access_token', data.accessToken);
-      localStorage.setItem('refresh_token', data.refreshToken);
+      setToken(data.token);
+      setRefreshToken(data.refreshToken);
 
       // Clear MFA session ID
       localStorage.removeItem('mfa_session_id');
@@ -79,6 +82,8 @@ export function useVerifyMfa() {
       queryClient.setQueryData(authKeys.session, data.user);
 
       toast.success('Authentication successful!');
+      // Small delay to ensure cookie is available for middleware checks
+      await new Promise((resolve) => setTimeout(resolve, 100));
       router.push('/dashboard');
     },
     onError: () => {
@@ -119,8 +124,7 @@ export function useLogout() {
     mutationFn: authApi.logout,
     onSuccess: () => {
       // Clear tokens
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      removeToken();
 
       // Clear auth store
       clearUser();
@@ -133,8 +137,7 @@ export function useLogout() {
     },
     onError: () => {
       // Even if the API call fails, still log out locally
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      removeToken();
       clearUser();
       queryClient.clear();
       router.push('/auth/login');
@@ -340,8 +343,7 @@ export function useRevokeAllSessions() {
     mutationFn: authApi.revokeAllSessions,
     onSuccess: () => {
       // Clear local storage
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      removeToken();
 
       toast.success('All sessions revoked. Please log in again.');
       queryClient.clear();

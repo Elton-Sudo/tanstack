@@ -37,19 +37,7 @@ export const setToken = (token: string): void => {
     // Set cookie for middleware with expiration matching JWT token
     const maxAge = getTokenExpiration(token);
 
-    // Debug: Log token details
-    try {
-      const parts = token.split('.');
-      const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-      console.log('Token set:', {
-        exp: new Date(payload.exp * 1000).toISOString(),
-        now: new Date().toISOString(),
-        maxAge,
-        isExpired: payload.exp * 1000 < Date.now(),
-      });
-    } catch (e) {
-      console.error('Failed to parse token for debugging', e);
-    }
+    // Optional: remove debug logs in production
 
     document.cookie = `auth_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
   }

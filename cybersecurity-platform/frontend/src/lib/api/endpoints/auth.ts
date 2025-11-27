@@ -11,7 +11,7 @@ export interface LoginCredentials {
 }
 
 export interface LoginResponse {
-  accessToken: string;
+  token: string;
   refreshToken: string;
   user: {
     id: string;
@@ -107,7 +107,7 @@ export const authApi = {
    * Refresh access token
    */
   refreshToken: (refreshToken: string) =>
-    apiClient.post<{ accessToken: string }>('/auth/refresh', { refreshToken }),
+    apiClient.post<{ token: string }>('/auth/refresh', { refreshToken }),
 
   /**
    * Request password reset email
