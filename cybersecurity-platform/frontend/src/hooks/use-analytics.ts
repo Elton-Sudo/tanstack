@@ -48,5 +48,74 @@ export const useAnalytics = () => {
         staleTime: 10 * 60 * 1000,
       });
     },
+
+    // Phishing Simulations
+    usePhishingTenantStats: (enabled = true) => {
+      return useQuery({
+        queryKey: ['phishing-tenant-stats'],
+        queryFn: analyticsService.getPhishingTenantStats,
+        staleTime: 5 * 60 * 1000,
+        enabled,
+      });
+    },
+
+    usePhishingUserHistory: (userId?: string, enabled = true) => {
+      return useQuery({
+        queryKey: ['phishing-user-history', userId],
+        queryFn: () => analyticsService.getPhishingUserHistory(userId),
+        staleTime: 5 * 60 * 1000,
+        enabled,
+      });
+    },
+
+    useVulnerableUsers: (
+      params?: {
+        minClickRate?: number;
+        departmentId?: string;
+      },
+      enabled = true,
+    ) => {
+      return useQuery({
+        queryKey: ['vulnerable-users', params],
+        queryFn: () => analyticsService.getVulnerableUsers(params),
+        staleTime: 5 * 60 * 1000,
+        enabled,
+      });
+    },
+
+    // Enhanced Risk Scoring
+    useRiskScoresWithUsers: (
+      params?: {
+        departmentId?: string;
+        riskLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+      },
+      enabled = true,
+    ) => {
+      return useQuery({
+        queryKey: ['risk-scores-with-users', params],
+        queryFn: () => analyticsService.getRiskScoresWithUsers(params),
+        staleTime: 5 * 60 * 1000,
+        enabled,
+      });
+    },
+
+    useTenantRiskStats: (enabled = true) => {
+      return useQuery({
+        queryKey: ['tenant-risk-stats'],
+        queryFn: analyticsService.getTenantRiskStats,
+        staleTime: 5 * 60 * 1000,
+        enabled,
+        refetchInterval: 30 * 1000, // Refetch every 30 seconds for real-time feel
+      });
+    },
+
+    useHighRiskUsers: (params?: { departmentId?: string }, enabled = true) => {
+      return useQuery({
+        queryKey: ['high-risk-users', params],
+        queryFn: () => analyticsService.getHighRiskUsers(params),
+        staleTime: 5 * 60 * 1000,
+        enabled,
+      });
+    },
   };
 };

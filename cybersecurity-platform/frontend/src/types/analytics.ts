@@ -114,3 +114,138 @@ export interface ComplianceMetrics {
   recommendations: string[];
   evidence: any[];
 }
+
+export interface PhishingCampaign {
+  id: string;
+  tenantId: string;
+  name: string;
+  subject: string;
+  emailTemplate: string;
+  targetDepartmentIds: string[];
+  targetUserIds?: string[];
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'EXPERT';
+  redFlags: string[];
+  scheduledFor?: Date;
+  sentAt?: Date;
+  completedAt?: Date;
+  status: 'DRAFT' | 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED';
+  createdBy: string;
+  createdAt: Date;
+  metadata?: Record<string, any>;
+}
+
+export interface PhishingEvent {
+  id: string;
+  tenantId: string;
+  userId: string;
+  campaignId: string;
+  subject: string;
+  sentAt: Date;
+  opened: boolean;
+  openedAt?: Date;
+  clicked: boolean;
+  clickedAt?: Date;
+  reported: boolean;
+  reportedAt?: Date;
+  deleted: boolean;
+  deletedAt?: Date;
+  metadata?: Record<string, any>;
+}
+
+export interface PhishingCampaignStats {
+  campaignId: string;
+  totalSent: number;
+  totalOpened: number;
+  totalClicked: number;
+  totalReported: number;
+  totalDeleted: number;
+  openRate: number;
+  clickRate: number;
+  reportRate: number;
+  deleteRate: number;
+  averageTimeToClick?: number;
+  averageTimeToReport?: number;
+}
+
+export interface PhishingUserHistory {
+  userId: string;
+  totalSimulations: number;
+  clicked: number;
+  reported: number;
+  clickRate: number;
+  reportRate: number;
+  lastSimulation?: Date;
+  trend: 'IMPROVING' | 'DECLINING' | 'STABLE';
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+}
+
+export interface PhishingTenantStats {
+  tenantId: string;
+  totalCampaigns: number;
+  totalSimulationsSent: number;
+  overallClickRate: number;
+  overallReportRate: number;
+  vulnerableUsers: number;
+  trainedUsers: number;
+  improvement: number;
+  departmentStats: PhishingDepartmentStat[];
+}
+
+export interface PhishingDepartmentStat {
+  departmentId: string;
+  departmentName: string;
+  totalSent: number;
+  clickRate: number;
+  reportRate: number;
+  vulnerableUserCount: number;
+}
+
+export interface VulnerableUser {
+  userId: string;
+  name: string;
+  email: string;
+  department: string;
+  clickRate: number;
+  reportRate: number;
+  lastClicked?: Date;
+  simulationsReceived: number;
+  riskLevel: 'HIGH' | 'CRITICAL';
+}
+
+export interface RiskScoreWithUser extends RiskScore {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    department?: string;
+  };
+  recommendations: string[];
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+}
+
+export interface TenantRiskStats {
+  tenantId: string;
+  averageRiskScore: number;
+  lowRiskUsers: number;
+  mediumRiskUsers: number;
+  highRiskUsers: number;
+  criticalRiskUsers: number;
+  departmentRiskScores: DepartmentRiskScore[];
+  trendData: RiskTrendData[];
+}
+
+export interface DepartmentRiskScore {
+  departmentId: string;
+  departmentName: string;
+  averageRiskScore: number;
+  userCount: number;
+  highRiskCount: number;
+  criticalRiskCount: number;
+}
+
+export interface RiskTrendData {
+  date: string;
+  averageScore: number;
+  highRiskCount: number;
+  criticalRiskCount: number;
+}

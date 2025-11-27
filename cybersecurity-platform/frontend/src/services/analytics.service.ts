@@ -3,8 +3,14 @@ import {
   ComplianceMetrics,
   DashboardMetrics,
   GenerateReportRequest,
+  PhishingCampaignStats,
+  PhishingTenantStats,
+  PhishingUserHistory,
   Report,
   RiskScore,
+  RiskScoreWithUser,
+  TenantRiskStats,
+  VulnerableUser,
 } from '@/types/analytics';
 import { ComplianceFramework } from '@/types/enums';
 
@@ -65,5 +71,66 @@ export const analyticsService = {
 
   async deleteReport(id: string): Promise<void> {
     await reportingServiceClient.delete(`/reports/${id}`);
+  },
+
+  // Phishing Simulations
+  async getPhishingCampaignStats(campaignId: string): Promise<PhishingCampaignStats> {
+    const response = await analyticsServiceClient.get<PhishingCampaignStats>(
+      `/phishing/campaigns/${campaignId}/stats`,
+    );
+    return response.data;
+  },
+
+  async getPhishingUserHistory(userId?: string): Promise<PhishingUserHistory> {
+    const endpoint = userId ? `/phishing/users/${userId}/history` : '/phishing/users/my/history';
+    const response = await analyticsServiceClient.get<PhishingUserHistory>(endpoint);
+    return response.data;
+  },
+
+  async getPhishingTenantStats(): Promise<PhishingTenantStats> {
+    const response =
+      await analyticsServiceClient.get<PhishingTenantStats>('/phishing/tenant/stats');
+    return response.data;
+  },
+
+  async getVulnerableUsers(params?: {
+    minClickRate?: number;
+    departmentId?: string;
+  }): Promise<VulnerableUser[]> {
+    const response = await analyticsServiceClient.get<VulnerableUser[]>(
+      '/phishing/vulnerable-users',
+      { params },
+    );
+    return response.data;
+  },
+
+  // Enhanced Risk Scoring
+  async getRiskScoresWithUsers(params?: {
+    departmentId?: string;
+    riskLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  }): Promise<RiskScoreWithUser[]> {
+    const response = await analyticsServiceClient.get<RiskScoreWithUser[]>(
+      '/risk-scores/detailed',
+      { params },
+    );
+    return response.data;
+  },
+
+  async getTenantRiskStats(): Promise<TenantRiskStats> {
+    const response = await analyticsServiceClient.get<TenantRiskStats>('/risk/tenant/stats');
+    return response.data;
+  },
+
+  async calculateMyRiskScore(): Promise<RiskScore> {
+    const response = await analyticsServiceClient.post<RiskScore>('/risk/calculate/my');
+    return response.data;
+  },
+
+  async getHighRiskUsers(params?: { departmentId?: string }): Promise<RiskScoreWithUser[]> {
+    const response = await analyticsServiceClient.get<RiskScoreWithUser[]>(
+      '/risk/high-risk-users',
+      { params },
+    );
+    return response.data;
   },
 };
