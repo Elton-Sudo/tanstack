@@ -1,10 +1,17 @@
 'use client';
 
+import { ActivityFeed } from '@/components/activity-feed';
+import { AIRecommendations } from '@/components/ai-recommendations';
+import { RiskForecast } from '@/components/risk-forecast';
 import { ServiceUnavailable } from '@/components/service-unavailable';
+import { UserDeepDiveModal } from '@/components/user-deep-dive-modal';
 import { useAnalytics } from '@/hooks/use-analytics';
+import { RiskScoreWithUser } from '@/types/analytics';
 import {
   AlertTriangle,
   Brain,
+  Download,
+  FileText,
   Shield,
   ShieldAlert,
   ShieldCheck,
@@ -12,7 +19,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -31,6 +38,7 @@ import {
 
 export default function RiskPage() {
   const { useTenantRiskStats, useHighRiskUsers, usePhishingTenantStats } = useAnalytics();
+  const [selectedUser, setSelectedUser] = useState<RiskScoreWithUser | null>(null);
 
   const {
     data: riskStats,
@@ -107,6 +115,16 @@ export default function RiskPage() {
     return '#8B0000'; // Dark red for critical
   };
 
+  const handleExportPDF = () => {
+    alert('PDF export functionality - would generate comprehensive risk report');
+    // In production, this would call an API to generate PDF
+  };
+
+  const handleExportExcel = () => {
+    alert('Excel export functionality - would export risk data to spreadsheet');
+    // In production, this would call an API to export to Excel
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -154,9 +172,25 @@ export default function RiskPage() {
             Real-time cybersecurity risk monitoring and threat visualization
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-lg border bg-card px-4 py-2">
-          <div className="h-2 w-2 rounded-full bg-brand-green animate-pulse" />
-          <span className="text-sm font-medium">Live Data</span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportPDF}
+            className="flex items-center gap-2 rounded-lg border bg-card px-4 py-2 hover:bg-accent transition-colors"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="text-sm font-medium">Export PDF</span>
+          </button>
+          <button
+            onClick={handleExportExcel}
+            className="flex items-center gap-2 rounded-lg border bg-card px-4 py-2 hover:bg-accent transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            <span className="text-sm font-medium">Export Excel</span>
+          </button>
+          <div className="flex items-center gap-2 rounded-lg border bg-card px-4 py-2">
+            <div className="h-2 w-2 rounded-full bg-brand-green animate-pulse" />
+            <span className="text-sm font-medium">Live Data</span>
+          </div>
         </div>
       </div>
 
@@ -276,7 +310,18 @@ export default function RiskPage() {
         </div>
       </div>
 
-      {/* Risk Distribution & Trends */}
+      {/* AI Recommendations */}
+      {riskStats && (
+        <AIRecommendations
+          riskStats={riskStats}
+          phishingClickRate={phishingStats?.overallClickRate || 0}
+        />
+      )}
+
+      {/* Predictive Forecast */}
+      {riskStats && <RiskForecast riskStats={riskStats} />}
+
+      {/* Risk Distribution & Live Activity */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Risk Distribution Pie Chart */}
         <div className="rounded-lg border bg-card p-6">
@@ -340,50 +385,56 @@ export default function RiskPage() {
         </div>
       </div>
 
-      {/* Department Heatmap */}
-      <div className="rounded-lg border bg-card p-6">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Brain className="h-5 w-5 text-brand-blue" />
-          Department Risk Heatmap
-        </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={departmentRiskData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis domain={[0, 100]} />
-            <Tooltip
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload;
-                  return (
-                    <div className="rounded-lg border bg-card p-4 shadow-lg">
-                      <p className="font-semibold">{data.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Average Score: <span className="font-bold">{data.score.toFixed(1)}</span>
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Total Users: <span className="font-bold">{data.users}</span>
-                      </p>
-                      <p className="text-sm text-brand-red">
-                        High Risk: <span className="font-bold">{data.highRisk}</span>
-                      </p>
-                      <p className="text-sm text-red-900">
-                        Critical: <span className="font-bold">{data.critical}</span>
-                      </p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Legend />
-            <Bar dataKey="score" name="Risk Score" radius={[8, 8, 0, 0]}>
-              {departmentRiskData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={getDepartmentColor(entry.score)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+      {/* Department Heatmap & Live Activity Feed */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Department Heatmap */}
+        <div className="rounded-lg border bg-card p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Brain className="h-5 w-5 text-brand-blue" />
+            Department Risk Heatmap
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={departmentRiskData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="rounded-lg border bg-card p-4 shadow-lg">
+                        <p className="font-semibold">{data.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Average Score: <span className="font-bold">{data.score.toFixed(1)}</span>
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Total Users: <span className="font-bold">{data.users}</span>
+                        </p>
+                        <p className="text-sm text-brand-red">
+                          High Risk: <span className="font-bold">{data.highRisk}</span>
+                        </p>
+                        <p className="text-sm text-red-900">
+                          Critical: <span className="font-bold">{data.critical}</span>
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Legend />
+              <Bar dataKey="score" name="Risk Score" radius={[8, 8, 0, 0]}>
+                {departmentRiskData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getDepartmentColor(entry.score)} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Live Activity Feed */}
+        <ActivityFeed phishingStats={phishingStats} />
       </div>
 
       {/* High Risk Users Table */}
@@ -410,9 +461,7 @@ export default function RiskPage() {
                       <p className="font-semibold">{user.user.name}</p>
                       <p className="text-sm text-muted-foreground">{user.user.email}</p>
                       {user.user.department && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {user.user.department}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">{user.user.department}</p>
                       )}
                     </div>
                   </div>
@@ -434,7 +483,10 @@ export default function RiskPage() {
                         {Math.round(user.trainingCompletionScore)}
                       </p>
                     </div>
-                    <button className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-accent transition-colors">
+                    <button
+                      onClick={() => setSelectedUser(user)}
+                      className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-brand-blue hover:text-white transition-colors"
+                    >
                       View Details
                     </button>
                   </div>
@@ -452,6 +504,15 @@ export default function RiskPage() {
           )}
         </div>
       </div>
+
+      {/* User Deep Dive Modal */}
+      {selectedUser && (
+        <UserDeepDiveModal
+          user={selectedUser}
+          isOpen={!!selectedUser}
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
     </div>
   );
 }
