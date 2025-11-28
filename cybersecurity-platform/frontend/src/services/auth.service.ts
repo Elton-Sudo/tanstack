@@ -16,9 +16,9 @@ import {
 export const authService = {
   async login(data: LoginRequest): Promise<LoginResponse> {
     const response = await authServiceClient.post<LoginResponse>('/auth/login', data);
-    const { token, refreshToken, user } = response.data;
+    const { accessToken, refreshToken, user } = response.data;
 
-    setToken(token);
+    setToken(accessToken);
     setRefreshToken(refreshToken);
     setUser(user);
 
@@ -27,9 +27,9 @@ export const authService = {
 
   async register(data: RegisterRequest): Promise<LoginResponse> {
     const response = await authServiceClient.post<LoginResponse>('/auth/register', data);
-    const { token, refreshToken, user } = response.data;
+    const { accessToken, refreshToken, user } = response.data;
 
-    setToken(token);
+    setToken(accessToken);
     setRefreshToken(refreshToken);
     setUser(user);
 
@@ -49,9 +49,9 @@ export const authService = {
 
   async refreshToken(data: RefreshTokenRequest): Promise<LoginResponse> {
     const response = await authServiceClient.post<LoginResponse>('/auth/refresh', data);
-    const { token, refreshToken } = response.data;
+    const { accessToken, refreshToken } = response.data;
 
-    setToken(token);
+    setToken(accessToken);
     setRefreshToken(refreshToken);
 
     return response.data;
