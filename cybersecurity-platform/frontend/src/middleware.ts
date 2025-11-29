@@ -73,6 +73,10 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+    // Exclude common static/public asset paths so middleware doesn't intercept them
+    // - images (Next.js public/images/* assets served at /images/*)
+    // - assets (common static folder)
+    // - robots.txt
+    '/((?!api|_next/static|_next/image|favicon.ico|public|images|assets|robots.txt|sw.js).*)',
   ],
 };

@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { useRegister } from '@/hooks/useAuth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, Check, Eye, EyeOff, Loader2 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -141,13 +140,10 @@ export function RegisterForm() {
           {/* Logo */}
           <div className="flex justify-center">
             <div className="relative h-12 w-[180px]">
-              <Image
+              <img
                 src="/images/swiiff-logo.png"
                 alt="SWIIFF Security"
-                fill
-                className="object-contain"
-                priority
-                unoptimized
+                className="h-full w-full object-contain"
               />
             </div>
           </div>
@@ -188,13 +184,10 @@ export function RegisterForm() {
         {/* Logo */}
         <div className="flex justify-center">
           <div className="relative h-12 w-[180px]">
-            <Image
+            <img
               src="/images/swiiff-logo.png"
               alt="SWIIFF Security"
-              fill
-              className="object-contain"
-              priority
-              unoptimized
+              className="h-full w-full object-contain"
             />
           </div>
         </div>
