@@ -5,6 +5,13 @@ import { AIRecommendations } from '@/components/ai-recommendations';
 import { RiskForecast } from '@/components/risk-forecast';
 import { ServiceUnavailable } from '@/components/service-unavailable';
 import { UserDeepDiveModal } from '@/components/user-deep-dive-modal';
+import {
+  AreaChartCard,
+  BarChartCard,
+  MetricCard,
+  PieChartCard,
+  RiskGauge,
+} from '@/components/visualizations';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { RiskScoreWithUser } from '@/types/analytics';
 import {
@@ -12,29 +19,12 @@ import {
   Brain,
   Download,
   FileText,
-  Shield,
   ShieldAlert,
   ShieldCheck,
   TrendingDown,
-  TrendingUp,
   Users,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 
 export default function RiskPage() {
   const { useTenantRiskStats, useHighRiskUsers, usePhishingTenantStats } = useAnalytics();
@@ -66,9 +56,9 @@ export default function RiskPage() {
   const riskDistribution = useMemo(() => {
     if (!riskStats) return [];
     return [
-      { name: 'Low Risk', value: riskStats.lowRiskUsers, color: 'var(--brand-green)' },
-      { name: 'Medium Risk', value: riskStats.mediumRiskUsers, color: 'var(--brand-orange)' },
-      { name: 'High Risk', value: riskStats.highRiskUsers, color: 'var(--brand-red)' },
+      { name: 'Low Risk', value: riskStats.lowRiskUsers, color: '#8CB841' },
+      { name: 'Medium Risk', value: riskStats.mediumRiskUsers, color: '#F5C242' },
+      { name: 'High Risk', value: riskStats.highRiskUsers, color: '#E86A33' },
       { name: 'Critical', value: riskStats.criticalRiskUsers, color: '#8B0000' },
     ];
   }, [riskStats]);
@@ -96,24 +86,6 @@ export default function RiskPage() {
     }));
   }, [riskStats]);
 
-  const getRiskColor = (score: number) => {
-    if (score >= 80) return 'brand-green';
-    if (score >= 60) return 'brand-orange';
-    return 'brand-red';
-  };
-
-  const getRiskLevel = (score: number) => {
-    if (score >= 80) return { text: 'Low Risk', icon: ShieldCheck };
-    if (score >= 60) return { text: 'Medium Risk', icon: Shield };
-    return { text: 'High Risk', icon: ShieldAlert };
-  };
-
-  const getDepartmentColor = (score: number) => {
-    if (score >= 80) return '#10B981'; // Green
-    if (score >= 60) return '#F59E0B'; // Orange
-    if (score >= 40) return '#EF4444'; // Red
-    return '#8B0000'; // Dark red for critical
-  };
 
   const handleExportPDF = () => {
     alert('PDF export functionality - would generate comprehensive risk report');
@@ -156,8 +128,6 @@ export default function RiskPage() {
   }
 
   const overallRisk = riskStats?.averageRiskScore || 0;
-  const riskLevel = getRiskLevel(overallRisk);
-  const RiskIcon = riskLevel.icon;
 
   return (
     <div className="space-y-6">
@@ -196,117 +166,57 @@ export default function RiskPage() {
 
       {/* Overall Risk Score & Quick Stats */}
       <div className="grid gap-6 md:grid-cols-3">
-        {/* Overall Risk Score - Professional Design */}
-        <div className="md:col-span-1 rounded-lg border bg-gradient-to-br from-card to-card/50 p-6 shadow-lg">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Overall Risk Score
-            </h3>
-            <RiskIcon className="h-5 w-5" style={{ color: `var(--${getRiskColor(overallRisk)})` }} />
-          </div>
-          <div className="flex items-center justify-center">
-            <div className="relative">
-              {/* Circular progress */}
-              <svg className="h-40 w-40 transform -rotate-90">
-                <circle
-                  cx="80"
-                  cy="80"
-                  r="70"
-                  stroke="currentColor"
-                  strokeWidth="12"
-                  fill="none"
-                  className="text-muted/20"
-                />
-                <circle
-                  cx="80"
-                  cy="80"
-                  r="70"
-                  stroke="currentColor"
-                  strokeWidth="12"
-                  fill="none"
-                  strokeDasharray={`${(overallRisk / 100) * 439.8} 439.8`}
-                  className="transition-all duration-1000 ease-out"
-                  style={{ color: `var(--${getRiskColor(overallRisk)})` }}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-4xl font-bold">{Math.round(overallRisk)}</span>
-                <span className="text-xs text-muted-foreground font-medium">/ 100</span>
-              </div>
-            </div>
-          </div>
-          <div className="text-center mt-4">
-            <p className="font-semibold text-lg">{riskLevel.text}</p>
-            <p className="text-xs text-muted-foreground mt-1">Organization Security Posture</p>
-          </div>
+        {/* Overall Risk Score - RiskGauge Component */}
+        <div className="md:col-span-1">
+          <RiskGauge
+            score={overallRisk}
+            title="Overall Risk Score"
+            subtitle="Organization Security Posture"
+            size={240}
+          />
         </div>
 
-        {/* Quick Stats Grid */}
+        {/* Quick Stats Grid - MetricCard Components */}
         <div className="md:col-span-2 grid gap-4 md:grid-cols-2">
-          <div className="rounded-lg border bg-card p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground font-medium">Critical Risk Users</p>
-                <p className="text-3xl font-bold text-brand-red mt-1">
-                  {riskStats?.criticalRiskUsers || 0}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Immediate action required</p>
-              </div>
-              <div className="rounded-full bg-brand-red/10 p-4">
-                <AlertTriangle className="h-8 w-8 text-brand-red" />
-              </div>
-            </div>
-          </div>
+          <MetricCard
+            title="Critical Risk Users"
+            value={riskStats?.criticalRiskUsers || 0}
+            subtitle="Immediate action required"
+            icon={AlertTriangle}
+            variant="error"
+            animate
+          />
 
-          <div className="rounded-lg border bg-card p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground font-medium">High Risk Users</p>
-                <p className="text-3xl font-bold text-brand-orange mt-1">
-                  {riskStats?.highRiskUsers || 0}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Intervention needed</p>
-              </div>
-              <div className="rounded-full bg-brand-orange/10 p-4">
-                <ShieldAlert className="h-8 w-8 text-brand-orange" />
-              </div>
-            </div>
-          </div>
+          <MetricCard
+            title="High Risk Users"
+            value={riskStats?.highRiskUsers || 0}
+            subtitle="Intervention needed"
+            icon={ShieldAlert}
+            variant="warning"
+            animate
+          />
 
-          <div className="rounded-lg border bg-card p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground font-medium">Protected Users</p>
-                <p className="text-3xl font-bold text-brand-green mt-1">
-                  {riskStats?.lowRiskUsers || 0}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Excellent security posture</p>
-              </div>
-              <div className="rounded-full bg-brand-green/10 p-4">
-                <ShieldCheck className="h-8 w-8 text-brand-green" />
-              </div>
-            </div>
-          </div>
+          <MetricCard
+            title="Protected Users"
+            value={riskStats?.lowRiskUsers || 0}
+            subtitle="Excellent security posture"
+            icon={ShieldCheck}
+            variant="success"
+            animate
+          />
 
-          <div className="rounded-lg border bg-card p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground font-medium">Phishing Click Rate</p>
-                <p className="text-3xl font-bold text-brand-blue mt-1">
-                  {phishingStats?.overallClickRate
-                    ? `${(phishingStats.overallClickRate * 100).toFixed(1)}%`
-                    : '0%'}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {phishingStats?.totalSimulationsSent || 0} simulations sent
-                </p>
-              </div>
-              <div className="rounded-full bg-brand-blue/10 p-4">
-                <TrendingDown className="h-8 w-8 text-brand-blue" />
-              </div>
-            </div>
-          </div>
+          <MetricCard
+            title="Phishing Click Rate"
+            value={
+              phishingStats?.overallClickRate
+                ? `${(phishingStats.overallClickRate * 100).toFixed(1)}%`
+                : '0%'
+            }
+            subtitle={`${phishingStats?.totalSimulationsSent || 0} simulations sent`}
+            icon={TrendingDown}
+            variant="primary"
+            animate
+          />
         </div>
       </div>
 
@@ -324,114 +234,35 @@ export default function RiskPage() {
       {/* Risk Distribution & Live Activity */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Risk Distribution Pie Chart */}
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Users className="h-5 w-5 text-brand-blue" />
-            Risk Distribution
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={riskDistribution}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, value, percent }) =>
-                  `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
-                }
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {riskDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+        <PieChartCard
+          title="Risk Distribution"
+          description="User risk levels across platform"
+          data={riskDistribution}
+          height={300}
+        />
 
         {/* Risk Trend Over Time */}
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-brand-green" />
-            Risk Trend (30 Days)
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={trendData}>
-              <defs>
-                <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--brand-blue)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--brand-blue)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Legend />
-              <Area
-                type="monotone"
-                dataKey="score"
-                stroke="var(--brand-blue)"
-                fillOpacity={1}
-                fill="url(#colorScore)"
-                name="Average Risk Score"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <AreaChartCard
+          title="Risk Trend (30 Days)"
+          description="Average risk score over time"
+          data={trendData}
+          xAxisKey="date"
+          dataKeys={[{ key: 'score', name: 'Average Risk Score', color: '#3B8EDE' }]}
+          height={300}
+        />
       </div>
 
       {/* Department Heatmap & Live Activity Feed */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Department Heatmap */}
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Brain className="h-5 w-5 text-brand-blue" />
-            Department Risk Heatmap
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={departmentRiskData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    return (
-                      <div className="rounded-lg border bg-card p-4 shadow-lg">
-                        <p className="font-semibold">{data.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Average Score: <span className="font-bold">{data.score.toFixed(1)}</span>
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Total Users: <span className="font-bold">{data.users}</span>
-                        </p>
-                        <p className="text-sm text-brand-red">
-                          High Risk: <span className="font-bold">{data.highRisk}</span>
-                        </p>
-                        <p className="text-sm text-red-900">
-                          Critical: <span className="font-bold">{data.critical}</span>
-                        </p>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
-              <Legend />
-              <Bar dataKey="score" name="Risk Score" radius={[8, 8, 0, 0]}>
-                {departmentRiskData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={getDepartmentColor(entry.score)} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <BarChartCard
+          title="Department Risk Heatmap"
+          description="Average risk scores by department"
+          data={departmentRiskData}
+          xAxisKey="name"
+          dataKeys={[{ key: 'score', name: 'Risk Score', color: '#3B8EDE' }]}
+          height={300}
+        />
 
         {/* Live Activity Feed */}
         <ActivityFeed phishingStats={phishingStats} />

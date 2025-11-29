@@ -50,18 +50,25 @@ export interface MetricCardProps {
 }
 
 const gradientVariants = {
-  primary: 'from-brand-blue-500/10 to-brand-blue-500/5 border-brand-blue-200 dark:border-brand-blue-800',
-  success: 'from-brand-green-500/10 to-brand-green-500/5 border-brand-green-200 dark:border-brand-green-800',
-  warning: 'from-brand-yellowGold-500/10 to-brand-yellowGold-500/5 border-brand-yellowGold-200 dark:border-brand-yellowGold-800',
-  error: 'from-brand-orangeRed-500/10 to-brand-orangeRed-500/5 border-brand-orangeRed-200 dark:border-brand-orangeRed-800',
+  primary:
+    'from-brand-blue-500/10 to-brand-blue-500/5 border-brand-blue-200 dark:border-brand-blue-800',
+  success:
+    'from-brand-green-500/10 to-brand-green-500/5 border-brand-green-200 dark:border-brand-green-800',
+  warning:
+    'from-brand-yellowGold-500/10 to-brand-yellowGold-500/5 border-brand-yellowGold-200 dark:border-brand-yellowGold-800',
+  error:
+    'from-brand-orangeRed-500/10 to-brand-orangeRed-500/5 border-brand-orangeRed-200 dark:border-brand-orangeRed-800',
   neutral: 'from-muted/50 to-muted/20 border-border',
 } as const;
 
 const iconVariants = {
   primary: 'text-brand-blue-600 bg-brand-blue-100 dark:text-brand-blue-400 dark:bg-brand-blue-950',
-  success: 'text-brand-green-600 bg-brand-green-100 dark:text-brand-green-400 dark:bg-brand-green-950',
-  warning: 'text-brand-yellowGold-700 bg-brand-yellowGold-100 dark:text-brand-yellowGold-400 dark:bg-brand-yellowGold-950',
-  error: 'text-brand-orangeRed-600 bg-brand-orangeRed-100 dark:text-brand-orangeRed-400 dark:bg-brand-orangeRed-950',
+  success:
+    'text-brand-green-600 bg-brand-green-100 dark:text-brand-green-400 dark:bg-brand-green-950',
+  warning:
+    'text-brand-yellowGold-700 bg-brand-yellowGold-100 dark:text-brand-yellowGold-400 dark:bg-brand-yellowGold-950',
+  error:
+    'text-brand-orangeRed-600 bg-brand-orangeRed-100 dark:text-brand-orangeRed-400 dark:bg-brand-orangeRed-950',
   neutral: 'text-muted-foreground bg-muted',
 } as const;
 
@@ -119,16 +126,15 @@ export default function MetricCard({
   animate = true,
   className,
 }: MetricCardProps) {
-  const numericValue = typeof value === 'number' ? value : parseInt(value.toString().replace(/,/g, ''), 10);
+  const numericValue =
+    typeof value === 'number' ? value : parseInt(value.toString().replace(/,/g, ''), 10);
   const animatedValue = useAnimatedCounter(
     isNaN(numericValue) ? 0 : numericValue,
     1000,
     animate && !isNaN(numericValue),
   );
 
-  const displayValue = animate && !isNaN(numericValue)
-    ? animatedValue.toLocaleString()
-    : value;
+  const displayValue = animate && !isNaN(numericValue) ? animatedValue.toLocaleString() : value;
 
   return (
     <Card
@@ -143,9 +149,7 @@ export default function MetricCard({
         <div className="flex-1 space-y-1">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-3xl font-bold tracking-tight text-foreground">
-              {displayValue}
-            </h3>
+            <h3 className="text-3xl font-bold tracking-tight text-foreground">{displayValue}</h3>
             {trend && (
               <div
                 className={cn(
@@ -164,22 +168,13 @@ export default function MetricCard({
               </div>
             )}
           </div>
-          {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
-          )}
-          {trend?.label && (
-            <p className="text-xs text-muted-foreground">{trend.label}</p>
-          )}
+          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          {trend?.label && <p className="text-xs text-muted-foreground">{trend.label}</p>}
         </div>
 
         {/* Icon */}
         {Icon && (
-          <div
-            className={cn(
-              'rounded-lg p-3',
-              iconVariants[variant],
-            )}
-          >
+          <div className={cn('rounded-lg p-3', iconVariants[variant])}>
             <Icon className="h-6 w-6" />
           </div>
         )}
