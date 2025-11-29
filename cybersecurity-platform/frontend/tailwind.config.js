@@ -261,10 +261,50 @@ module.exports = {
             height: 0,
           },
         },
+        shimmer: {
+          '0%': {
+            backgroundPosition: '-1000px 0',
+          },
+          '100%': {
+            backgroundPosition: '1000px 0',
+          },
+        },
+        'fade-in': {
+          from: {
+            opacity: 0,
+          },
+          to: {
+            opacity: 1,
+          },
+        },
+        'slide-up': {
+          from: {
+            transform: 'translateY(10px)',
+            opacity: 0,
+          },
+          to: {
+            transform: 'translateY(0)',
+            opacity: 1,
+          },
+        },
+        'slide-down': {
+          from: {
+            transform: 'translateY(-10px)',
+            opacity: 0,
+          },
+          to: {
+            transform: 'translateY(0)',
+            opacity: 1,
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        shimmer: 'shimmer 2s linear infinite',
+        'fade-in': 'fade-in 0.3s ease-out',
+        'slide-up': 'slide-up 0.3s ease-out',
+        'slide-down': 'slide-down 0.3s ease-out',
       },
     },
   },

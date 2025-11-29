@@ -115,8 +115,9 @@ const useAnimatedCounter = (end: number, duration: number = 1000, enabled: boole
  * - Trend indicator with percentage
  * - Icon support
  * - Responsive design
+ * - Memoized for optimal performance
  */
-export default function MetricCard({
+const MetricCard = React.memo(function MetricCard({
   title,
   value,
   subtitle,
@@ -139,7 +140,7 @@ export default function MetricCard({
   return (
     <Card
       className={cn(
-        'relative overflow-hidden bg-gradient-to-br p-6 transition-all duration-200 hover:shadow-md',
+        'relative overflow-hidden bg-gradient-to-br p-6 transition-all duration-200 hover:shadow-md animate-fade-in',
         gradientVariants[variant],
         className,
       )}
@@ -181,4 +182,6 @@ export default function MetricCard({
       </div>
     </Card>
   );
-}
+});
+
+export default MetricCard;
