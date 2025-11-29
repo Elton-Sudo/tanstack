@@ -19,7 +19,14 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-type SettingsTab = 'profile' | 'security' | 'appearance' | 'notifications' | 'alerts' | 'branding' | 'integrations';
+type SettingsTab =
+  | 'profile'
+  | 'security'
+  | 'appearance'
+  | 'notifications'
+  | 'alerts'
+  | 'branding'
+  | 'integrations';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
@@ -87,9 +94,7 @@ export default function SettingsPage() {
           <SettingsIcon className="h-8 w-8 text-brand-blue" />
           <h1 className="text-3xl font-bold">Settings</h1>
         </div>
-        <p className="text-muted-foreground">
-          Manage your platform configuration and preferences
-        </p>
+        <p className="text-muted-foreground">Manage your platform configuration and preferences</p>
       </div>
 
       {/* Tabs */}
@@ -213,8 +218,8 @@ export default function SettingsPage() {
                   <Button variant="outline">Enable MFA</Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Two-factor authentication adds an additional layer of security to your account by requiring
-                  more than just a password to log in.
+                  Two-factor authentication adds an additional layer of security to your account by
+                  requiring more than just a password to log in.
                 </p>
               </CardContent>
             </Card>
@@ -227,7 +232,9 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <p className="font-medium">Current Session</p>
-                    <p className="text-sm text-muted-foreground">Chrome on macOS • Last active: Now</p>
+                    <p className="text-sm text-muted-foreground">
+                      Chrome on macOS • Last active: Now
+                    </p>
                   </div>
                   <span className="text-xs px-2 py-1 rounded bg-brand-green/10 text-brand-green-700">
                     Active
@@ -236,7 +243,9 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <p className="font-medium">Previous Session</p>
-                    <p className="text-sm text-muted-foreground">Safari on iPhone • Last active: 2 hours ago</p>
+                    <p className="text-sm text-muted-foreground">
+                      Safari on iPhone • Last active: 2 hours ago
+                    </p>
                   </div>
                   <Button variant="ghost" size="sm">
                     Revoke
@@ -324,7 +333,9 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Security Alerts</p>
-                    <p className="text-sm text-muted-foreground">Important security notifications</p>
+                    <p className="text-sm text-muted-foreground">
+                      Important security notifications
+                    </p>
                   </div>
                   <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-brand-green">
                     <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
@@ -333,7 +344,9 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Weekly Summary</p>
-                    <p className="text-sm text-muted-foreground">Weekly progress and activity summary</p>
+                    <p className="text-sm text-muted-foreground">
+                      Weekly progress and activity summary
+                    </p>
                   </div>
                   <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-muted">
                     <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
@@ -342,7 +355,9 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Marketing Emails</p>
-                    <p className="text-sm text-muted-foreground">Product updates and announcements</p>
+                    <p className="text-sm text-muted-foreground">
+                      Product updates and announcements
+                    </p>
                   </div>
                   <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-muted">
                     <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
@@ -359,7 +374,9 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Course Reminders</p>
-                    <p className="text-sm text-muted-foreground">Reminders for incomplete courses</p>
+                    <p className="text-sm text-muted-foreground">
+                      Reminders for incomplete courses
+                    </p>
                   </div>
                   <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-brand-green">
                     <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
@@ -368,7 +385,9 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Quiz Deadlines</p>
-                    <p className="text-sm text-muted-foreground">Upcoming quiz and assessment deadlines</p>
+                    <p className="text-sm text-muted-foreground">
+                      Upcoming quiz and assessment deadlines
+                    </p>
                   </div>
                   <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-brand-green">
                     <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
@@ -452,7 +471,9 @@ export default function SettingsPage() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Receive real-time notifications about events in your account.
                 </p>
-                <Button variant="outline" className="w-full">Add Webhook Endpoint</Button>
+                <Button variant="outline" className="w-full">
+                  Add Webhook Endpoint
+                </Button>
               </CardContent>
             </Card>
           </div>

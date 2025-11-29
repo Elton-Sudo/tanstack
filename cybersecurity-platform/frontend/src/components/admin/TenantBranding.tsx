@@ -191,7 +191,11 @@ export function TenantBranding() {
                   {settings.logoLight ? (
                     <div className="space-y-2">
                       <p className="text-sm">logo-light.png</p>
-                      <Button variant="outline" size="sm" onClick={() => handleFileUpload('logoLight')}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleFileUpload('logoLight')}
+                      >
                         Replace
                       </Button>
                     </div>
@@ -213,7 +217,11 @@ export function TenantBranding() {
                   {settings.logoDark ? (
                     <div className="space-y-2">
                       <p className="text-sm">logo-dark.png</p>
-                      <Button variant="outline" size="sm" onClick={() => handleFileUpload('logoDark')}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleFileUpload('logoDark')}
+                      >
                         Replace
                       </Button>
                     </div>
@@ -232,7 +240,11 @@ export function TenantBranding() {
                   {settings.favicon ? (
                     <div className="space-y-2">
                       <p className="text-sm">favicon.ico</p>
-                      <Button variant="outline" size="sm" onClick={() => handleFileUpload('favicon')}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleFileUpload('favicon')}
+                      >
                         Replace
                       </Button>
                     </div>
@@ -243,7 +255,9 @@ export function TenantBranding() {
                     </Button>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">Recommended: ICO or PNG, 32x32px or 64x64px</p>
+                <p className="text-xs text-muted-foreground">
+                  Recommended: ICO or PNG, 32x32px or 64x64px
+                </p>
               </div>
             </CardContent>
           </Card>
