@@ -2,7 +2,6 @@
 
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -16,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -54,9 +54,18 @@ export function LoginForm({ onSubmit, isPending = false }: LoginFormProps) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 px-4 py-12 relative overflow-hidden">
       {/* Background decorative elements with SWIIF colors */}
-      <div className="absolute top-0 left-0 w-64 h-64 rounded-full opacity-20 blur-3xl" style={{ backgroundColor: '#F5C242' }} />
-      <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ backgroundColor: '#3B8EDE' }} />
-      <div className="absolute top-1/2 right-1/4 w-48 h-48 rounded-full opacity-20 blur-3xl" style={{ backgroundColor: '#8CB841' }} />
+      <div
+        className="absolute top-0 left-0 w-64 h-64 rounded-full opacity-20 blur-3xl"
+        style={{ backgroundColor: '#F5C242' }}
+      />
+      <div
+        className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-20 blur-3xl"
+        style={{ backgroundColor: '#3B8EDE' }}
+      />
+      <div
+        className="absolute top-1/2 right-1/4 w-48 h-48 rounded-full opacity-20 blur-3xl"
+        style={{ backgroundColor: '#8CB841' }}
+      />
 
       {/* Theme Toggle - Top Right */}
       <div className="absolute right-4 top-4 z-10">
