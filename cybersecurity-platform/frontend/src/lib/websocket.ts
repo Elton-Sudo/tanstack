@@ -3,7 +3,12 @@
  * Handles live data streaming for risk scores, phishing events, and alerts
  */
 
-type EventType = 'risk_update' | 'phishing_event' | 'critical_alert' | 'user_login' | 'training_complete';
+type EventType =
+  | 'risk_update'
+  | 'phishing_event'
+  | 'critical_alert'
+  | 'user_login'
+  | 'training_complete';
 
 interface SecurityEvent {
   type: EventType;
@@ -53,7 +58,13 @@ class WebSocketService {
         // Subscribe to events
         this.send({
           type: 'subscribe',
-          events: ['risk_update', 'phishing_event', 'critical_alert', 'user_login', 'training_complete'],
+          events: [
+            'risk_update',
+            'phishing_event',
+            'critical_alert',
+            'user_login',
+            'training_complete',
+          ],
         });
       };
 

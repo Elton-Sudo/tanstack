@@ -75,7 +75,12 @@ export default function RiskGauge({
     return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
   };
 
-  function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
+  function polarToCartesian(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    angleInDegrees: number,
+  ) {
     const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
     return {
       x: centerX + radius * Math.cos(angleInRadians),
@@ -88,7 +93,13 @@ export default function RiskGauge({
       <div className="relative" style={{ width: size, height: size / 2 + 20 }}>
         <svg width={size} height={size / 2 + 20} className="overflow-visible">
           <defs>
-            <linearGradient id={`riskGradient-${normalizedScore}`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <linearGradient
+              id={`riskGradient-${normalizedScore}`}
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="0%"
+            >
               <stop offset="0%" stopColor={riskData.gradient[0]} stopOpacity="1" />
               <stop offset="100%" stopColor={riskData.gradient[1]} stopOpacity="1" />
             </linearGradient>
@@ -118,10 +129,7 @@ export default function RiskGauge({
         </svg>
 
         {/* Center score display */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2 text-center"
-          style={{ bottom: '10px' }}
-        >
+        <div className="absolute left-1/2 -translate-x-1/2 text-center" style={{ bottom: '10px' }}>
           <div className="text-4xl font-bold" style={{ color: riskData.color }}>
             {Math.round(normalizedScore)}
           </div>
@@ -132,10 +140,7 @@ export default function RiskGauge({
       {/* Label */}
       {showLabel && (
         <div className="text-center">
-          <div
-            className="text-sm font-semibold"
-            style={{ color: riskData.color }}
-          >
+          <div className="text-sm font-semibold" style={{ color: riskData.color }}>
             {label || riskData.level}
           </div>
         </div>

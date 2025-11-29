@@ -50,7 +50,11 @@ export function SecurityChatbot({ className = '' }: SecurityChatbotProps) {
       keywords: ['phishing', 'phish', 'suspicious email', 'fake email'],
       response:
         "Phishing is a cybercrime where attackers impersonate legitimate organizations to steal sensitive data. Key red flags include:\n\n1. Generic greetings ('Dear Customer')\n2. Urgent language creating panic\n3. Spelling/grammar errors\n4. Suspicious sender addresses\n5. Requests for passwords or personal info\n6. Unexpected attachments or links\n\nAlways verify sender identity before clicking links or downloading attachments. When in doubt, contact IT security.",
-      suggestions: ['How to report phishing?', 'Phishing training resources', 'Recent phishing trends'],
+      suggestions: [
+        'How to report phishing?',
+        'Phishing training resources',
+        'Recent phishing trends',
+      ],
     },
     popia: {
       keywords: ['popia', 'data protection', 'privacy', 'personal information'],
@@ -67,7 +71,7 @@ export function SecurityChatbot({ className = '' }: SecurityChatbotProps) {
     mfa: {
       keywords: ['mfa', 'multi-factor', '2fa', 'two-factor', 'authentication'],
       response:
-        "Multi-Factor Authentication (MFA) adds extra security layers beyond just passwords:\n\n**Types of MFA:**\n1. Something you know (password)\n2. Something you have (phone, security key)\n3. Something you are (fingerprint, face)\n\n**Benefits:**\n- Blocks 99.9% of automated attacks\n- Protects even if password is compromised\n- Required for POPIA compliance\n\n**Setup:**\n1. Go to Account Settings > Security\n2. Enable MFA\n3. Choose method (authenticator app recommended)\n4. Scan QR code\n5. Save backup codes\n\nUse apps like Microsoft Authenticator or Google Authenticator.",
+        'Multi-Factor Authentication (MFA) adds extra security layers beyond just passwords:\n\n**Types of MFA:**\n1. Something you know (password)\n2. Something you have (phone, security key)\n3. Something you are (fingerprint, face)\n\n**Benefits:**\n- Blocks 99.9% of automated attacks\n- Protects even if password is compromised\n- Required for POPIA compliance\n\n**Setup:**\n1. Go to Account Settings > Security\n2. Enable MFA\n3. Choose method (authenticator app recommended)\n4. Scan QR code\n5. Save backup codes\n\nUse apps like Microsoft Authenticator or Google Authenticator.',
       suggestions: ['Best MFA apps?', 'Lost MFA device help', 'Backup codes'],
     },
     incident: {
@@ -79,7 +83,7 @@ export function SecurityChatbot({ className = '' }: SecurityChatbotProps) {
     training: {
       keywords: ['training', 'course', 'learn', 'certification'],
       response:
-        "Available Security Training:\n\n**Core Courses:**\n1. Phishing Awareness Training (30 min)\n2. Password Security Fundamentals (20 min)\n3. POPIA Compliance for Employees (45 min)\n4. Social Engineering Defense (30 min)\n5. Secure Remote Work (25 min)\n\n**Advanced:**\n- Incident Response Procedures\n- Data Classification\n- Secure Development Practices\n\n**Certifications:**\nComplete all core courses + pass assessments to earn your Security Awareness Certificate.\n\nAccess courses at: /courses",
+        'Available Security Training:\n\n**Core Courses:**\n1. Phishing Awareness Training (30 min)\n2. Password Security Fundamentals (20 min)\n3. POPIA Compliance for Employees (45 min)\n4. Social Engineering Defense (30 min)\n5. Secure Remote Work (25 min)\n\n**Advanced:**\n- Incident Response Procedures\n- Data Classification\n- Secure Development Practices\n\n**Certifications:**\nComplete all core courses + pass assessments to earn your Security Awareness Certificate.\n\nAccess courses at: /courses',
       suggestions: ['View my training progress', 'Upcoming courses', 'Certificate requirements'],
     },
   };
@@ -141,19 +145,22 @@ export function SecurityChatbot({ className = '' }: SecurityChatbotProps) {
     setIsTyping(true);
 
     // Simulate AI processing delay
-    setTimeout(() => {
-      const response = generateResponse(input);
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response.content,
-        timestamp: new Date(),
-        suggestions: response.suggestions,
-      };
+    setTimeout(
+      () => {
+        const response = generateResponse(input);
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: response.content,
+          timestamp: new Date(),
+          suggestions: response.suggestions,
+        };
 
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsTyping(false);
-    }, 1000 + Math.random() * 1000); // 1-2 second delay
+        setMessages((prev) => [...prev, aiMessage]);
+        setIsTyping(false);
+      },
+      1000 + Math.random() * 1000,
+    ); // 1-2 second delay
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -228,12 +235,13 @@ export function SecurityChatbot({ className = '' }: SecurityChatbotProps) {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    message.role === 'user'
-                      ? 'bg-brand-blue text-white'
-                      : 'bg-muted'
+                    message.role === 'user' ? 'bg-brand-blue text-white' : 'bg-muted'
                   }`}
                 >
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>

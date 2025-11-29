@@ -99,9 +99,7 @@ export function UserDeepDiveModal({ user, isOpen, onClose }: UserDeepDiveModalPr
           <div className={`rounded-lg border p-6 ${getRiskBg(user.overallScore)}`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Overall Risk Score
-                </p>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Overall Risk Score</p>
                 <p className={`text-5xl font-bold ${getRiskColor(user.overallScore)}`}>
                   {Math.round(user.overallScore)}
                 </p>

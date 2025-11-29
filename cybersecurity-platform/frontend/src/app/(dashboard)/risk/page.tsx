@@ -37,11 +37,7 @@ export default function RiskPage() {
     refetch: refetchRisk,
   } = useTenantRiskStats();
 
-  const {
-    data: highRiskUsers,
-    isLoading: usersLoading,
-    isError: usersError,
-  } = useHighRiskUsers();
+  const { data: highRiskUsers, isLoading: usersLoading, isError: usersError } = useHighRiskUsers();
 
   const {
     data: phishingStats,
@@ -85,7 +81,6 @@ export default function RiskPage() {
       critical: item.criticalRiskCount,
     }));
   }, [riskStats]);
-
 
   const handleExportPDF = () => {
     alert('PDF export functionality - would generate comprehensive risk report');

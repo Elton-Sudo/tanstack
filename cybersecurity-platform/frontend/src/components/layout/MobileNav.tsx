@@ -92,18 +92,11 @@ export default function MobileNav({ items = defaultNavItems, className }: Mobile
               className={cn(
                 'flex flex-col items-center justify-center gap-1 rounded-lg transition-all duration-200',
                 'hover:bg-muted/50 active:bg-muted',
-                isActive
-                  ? 'text-brand-blue-600 dark:text-brand-blue-400'
-                  : 'text-muted-foreground',
+                isActive ? 'text-brand-blue-600 dark:text-brand-blue-400' : 'text-muted-foreground',
               )}
             >
               <Icon className={cn('h-5 w-5', isActive && 'scale-110')} />
-              <span
-                className={cn(
-                  'text-[10px] font-medium',
-                  isActive && 'font-semibold',
-                )}
-              >
+              <span className={cn('text-[10px] font-medium', isActive && 'font-semibold')}>
                 {item.label}
               </span>
             </Link>

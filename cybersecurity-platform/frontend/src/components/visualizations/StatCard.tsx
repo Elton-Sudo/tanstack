@@ -58,9 +58,7 @@ export default function StatCard({
       <div className="flex items-center justify-between space-x-2">
         <div className="flex-1 space-y-1">
           <p className="text-xs font-medium text-muted-foreground">{label}</p>
-          <p className={cn('text-2xl font-bold', colorVariants[variant])}>
-            {value}
-          </p>
+          <p className={cn('text-2xl font-bold', colorVariants[variant])}>{value}</p>
         </div>
         {Icon && (
           <div className="rounded-full bg-muted p-2">

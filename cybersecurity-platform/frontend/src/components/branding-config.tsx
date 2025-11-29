@@ -60,7 +60,7 @@ export function BrandingConfigPanel({ onSave, className = '' }: BrandingConfigPa
     }
   };
 
-  const applyPreset = (preset: typeof colorPresets[0]) => {
+  const applyPreset = (preset: (typeof colorPresets)[0]) => {
     setConfig({
       ...config,
       primaryColor: preset.primary,
@@ -198,18 +198,12 @@ export function BrandingConfigPanel({ onSave, className = '' }: BrandingConfigPa
                   className="rounded-lg border p-3 hover:bg-accent transition-colors text-left"
                 >
                   <div className="flex gap-1 mb-2">
-                    <div
-                      className="h-6 w-6 rounded"
-                      style={{ backgroundColor: preset.primary }}
-                    />
+                    <div className="h-6 w-6 rounded" style={{ backgroundColor: preset.primary }} />
                     <div
                       className="h-6 w-6 rounded"
                       style={{ backgroundColor: preset.secondary }}
                     />
-                    <div
-                      className="h-6 w-6 rounded"
-                      style={{ backgroundColor: preset.accent }}
-                    />
+                    <div className="h-6 w-6 rounded" style={{ backgroundColor: preset.accent }} />
                   </div>
                   <p className="text-xs font-medium">{preset.name}</p>
                 </button>

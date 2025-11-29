@@ -75,10 +75,8 @@ export function AIRecommendations({ riskStats, phishingClickRate }: AIRecommenda
 
     // Positive trend
     if (riskStats.trendData && riskStats.trendData.length >= 2) {
-      const latestScore =
-        riskStats.trendData[riskStats.trendData.length - 1]?.averageScore || 0;
-      const previousScore =
-        riskStats.trendData[riskStats.trendData.length - 2]?.averageScore || 0;
+      const latestScore = riskStats.trendData[riskStats.trendData.length - 1]?.averageScore || 0;
+      const previousScore = riskStats.trendData[riskStats.trendData.length - 2]?.averageScore || 0;
       const improvement = latestScore - previousScore;
 
       if (improvement > 5) {
@@ -167,9 +165,7 @@ export function AIRecommendations({ riskStats, phishingClickRate }: AIRecommenda
         </div>
         <div>
           <h3 className="text-lg font-semibold">AI-Powered Recommendations</h3>
-          <p className="text-sm text-muted-foreground">
-            Smart insights based on pattern analysis
-          </p>
+          <p className="text-sm text-muted-foreground">Smart insights based on pattern analysis</p>
         </div>
       </div>
 
@@ -212,7 +208,9 @@ export function AIRecommendations({ riskStats, phishingClickRate }: AIRecommenda
                       <p className="text-sm text-muted-foreground mt-1">{rec.description}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`text-xs font-medium px-2 py-1 rounded ${getImpactBadge(rec.impact)}`}>
+                      <span
+                        className={`text-xs font-medium px-2 py-1 rounded ${getImpactBadge(rec.impact)}`}
+                      >
                         {rec.impact}
                       </span>
                       <span className="text-xs text-muted-foreground">

@@ -28,7 +28,7 @@ const defaultBranding: BrandingConfig = {
 };
 
 export function Logo({
-  width: _width = 150,
+  width = 150,
   height = 40,
   className = '',
   href = '/',
@@ -49,12 +49,12 @@ export function Logo({
     <div className={`flex items-center gap-2 ${className}`}>
       {/* Custom Logo or Default Icon */}
       {customLogoUrl ? (
-        <div className="relative" style={{ width: height, height: height }}>
+        <div className="relative" style={{ width, height }}>
           <Image
             src={customLogoUrl}
             alt={`${brandConfig.appName} Logo`}
             fill
-            className="object-contain"
+            className="object-contain object-left"
             priority
           />
         </div>
@@ -95,15 +95,11 @@ export function Logo({
         </div>
       )}
 
-      {/* App Name */}
-      {showText && (
+      {/* App Name - only show if no custom logo or showText is explicitly true */}
+      {showText && !customLogoUrl && (
         <span
           className="text-xl font-bold text-foreground transition-colors"
-          style={
-            brandConfig.primaryColor && !customLogoUrl
-              ? { color: brandConfig.primaryColor }
-              : undefined
-          }
+          style={brandConfig.primaryColor ? { color: brandConfig.primaryColor } : undefined}
         >
           {brandConfig.appName}
         </span>

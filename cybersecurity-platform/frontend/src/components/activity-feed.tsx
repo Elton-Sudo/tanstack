@@ -16,7 +16,13 @@ import { useEffect, useState } from 'react';
 
 interface ActivityEvent {
   id: string;
-  type: 'phishing_reported' | 'phishing_clicked' | 'risk_improved' | 'risk_degraded' | 'training_completed' | 'user_at_risk';
+  type:
+    | 'phishing_reported'
+    | 'phishing_clicked'
+    | 'risk_improved'
+    | 'risk_degraded'
+    | 'training_completed'
+    | 'user_at_risk';
   user: string;
   department?: string;
   timestamp: Date;

@@ -156,7 +156,10 @@ export const gradients = {
 /**
  * Utility function to format chart values
  */
-export const formatValue = (value: number, type: 'number' | 'percent' | 'currency' = 'number'): string => {
+export const formatValue = (
+  value: number,
+  type: 'number' | 'percent' | 'currency' = 'number',
+): string => {
   switch (type) {
     case 'percent':
       return `${value}%`;

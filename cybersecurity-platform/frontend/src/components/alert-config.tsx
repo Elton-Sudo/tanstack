@@ -8,7 +8,12 @@ interface AlertRule {
   name: string;
   description: string;
   enabled: boolean;
-  trigger: 'risk_score' | 'phishing_click' | 'training_overdue' | 'critical_user' | 'multiple_failures';
+  trigger:
+    | 'risk_score'
+    | 'phishing_click'
+    | 'training_overdue'
+    | 'critical_user'
+    | 'multiple_failures';
   threshold?: number;
   recipients: string[];
   channels: ('email' | 'sms' | 'push')[];
@@ -94,7 +99,9 @@ export function AlertConfig({ onSave, className = '' }: AlertConfigProps) {
 
     setAlertRules((prev) =>
       prev.map((rule) =>
-        rule.id === ruleId ? { ...rule, recipients: [...rule.recipients, newRecipient.trim()] } : rule,
+        rule.id === ruleId
+          ? { ...rule, recipients: [...rule.recipients, newRecipient.trim()] }
+          : rule,
       ),
     );
     setNewRecipient('');

@@ -6,7 +6,14 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { axisConfig, cartesianGridConfig, chartColors, getColorByIndex, responsiveConfig, tooltipConfig } from '@/lib/chart-config';
+import {
+  axisConfig,
+  cartesianGridConfig,
+  chartColors,
+  getColorByIndex,
+  responsiveConfig,
+  tooltipConfig,
+} from '@/lib/chart-config';
 import React from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -85,15 +92,9 @@ export default function BarChartCard({
         <ResponsiveContainer width="100%" height={height}>
           <BarChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
             {showGrid && <CartesianGrid {...cartesianGridConfig} />}
-            <XAxis
-              dataKey={xAxisKey}
-              {...axisConfig}
-            />
+            <XAxis dataKey={xAxisKey} {...axisConfig} />
             <YAxis {...axisConfig} />
-            <Tooltip
-              {...tooltipConfig}
-              contentStyle={tooltipConfig.contentStyle}
-            />
+            <Tooltip {...tooltipConfig} contentStyle={tooltipConfig.contentStyle} />
             {dataKeys.map((item, index) => (
               <Bar
                 key={item.key}

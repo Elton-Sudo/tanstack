@@ -7,6 +7,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import {
   filterNavigationByRole,
   navigationItems,
@@ -65,16 +66,29 @@ export default function Sidebar() {
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex h-16 items-center justify-between border-b px-4">
-            {!collapsed && (
-              <div className="flex items-center gap-2">
-                <div className="relative h-8 w-8">
-                  <div className="flex h-8 w-8 items-center justify-center rounded bg-brand-blue-500">
-                    <span className="text-lg font-bold text-white">S</span>
-                  </div>
+            <Link href="/dashboard" className="flex items-center">
+              {!collapsed ? (
+                <div className="relative h-10 w-[180px]">
+                  <Image
+                    src="/images/swiiff-logo.png"
+                    alt="SWIIFF Security"
+                    fill
+                    className="object-contain object-left"
+                    priority
+                  />
                 </div>
-                <span className="font-bold text-foreground">SWIIFF</span>
-              </div>
-            )}
+              ) : (
+                <div className="relative h-10 w-10">
+                  <Image
+                    src="/images/swiiff-icon.png"
+                    alt="SWIIFF Security"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+              )}
+            </Link>
 
             {/* Mobile Close / Desktop Toggle */}
             <Button
@@ -164,48 +178,64 @@ function SidebarItem({ item, pathname, collapsed, onNavigate, level = 0 }: Sideb
   const isActive = pathname === item.href;
   const isParentActive = hasChildren && item.children?.some((child) => pathname === child.href);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = () => {
     if (hasChildren) {
-      e.preventDefault();
       setExpanded(!expanded);
     } else {
       onNavigate();
     }
   };
 
+  const itemClasses = cn(
+    'relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
+    'hover:bg-muted/50 dark:hover:bg-muted/20',
+    isActive &&
+      'border-l-4 border-l-brand-blue-500 bg-brand-blue-50 text-brand-blue-700 dark:bg-brand-blue-950/30 dark:text-brand-blue-300',
+    isParentActive && !isActive && 'bg-muted/30',
+    collapsed && 'justify-center px-2',
+    level > 0 && 'ml-4',
+  );
+
+  const itemContent = (
+    <>
+      <item.icon className="h-5 w-5 shrink-0" />
+      {!collapsed && (
+        <>
+          <span className="flex-1">{item.label}</span>
+          {item.badge && (
+            <span className="rounded-full bg-brand-blue-500 px-2 py-0.5 text-xs font-medium text-white">
+              {item.badge}
+            </span>
+          )}
+          {hasChildren && (
+            <ChevronRight className={cn('h-4 w-4 transition-transform', expanded && 'rotate-90')} />
+          )}
+        </>
+      )}
+    </>
+  );
+
   return (
     <li>
-      <Link
-        href={item.href}
-        onClick={handleClick}
-        className={cn(
-          'relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
-          'hover:bg-muted/50 dark:hover:bg-muted/20',
-          isActive &&
-            'border-l-4 border-l-brand-blue-500 bg-brand-blue-50 text-brand-blue-700 dark:bg-brand-blue-950/30 dark:text-brand-blue-300',
-          isParentActive && !isActive && 'bg-muted/30',
-          collapsed && 'justify-center px-2',
-          level > 0 && 'ml-4',
-        )}
-        title={collapsed ? item.label : undefined}
-      >
-        <item.icon className="h-5 w-5 shrink-0" />
-        {!collapsed && (
-          <>
-            <span className="flex-1">{item.label}</span>
-            {item.badge && (
-              <span className="rounded-full bg-brand-blue-500 px-2 py-0.5 text-xs font-medium text-white">
-                {item.badge}
-              </span>
-            )}
-            {hasChildren && (
-              <ChevronRight
-                className={cn('h-4 w-4 transition-transform', expanded && 'rotate-90')}
-              />
-            )}
-          </>
-        )}
-      </Link>
+      {hasChildren ? (
+        <button
+          onClick={handleClick}
+          className={cn(itemClasses, 'w-full text-left')}
+          title={collapsed ? item.label : undefined}
+          type="button"
+        >
+          {itemContent}
+        </button>
+      ) : (
+        <Link
+          href={item.href}
+          onClick={handleClick}
+          className={itemClasses}
+          title={collapsed ? item.label : undefined}
+        >
+          {itemContent}
+        </Link>
+      )}
 
       {/* Child Items */}
       {hasChildren && !collapsed && expanded && (

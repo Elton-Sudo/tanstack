@@ -182,7 +182,12 @@ export function RiskForecast({ riskStats }: RiskForecastProps) {
             }}
           />
           <Legend />
-          <ReferenceLine x={forecastData.find((d) => d.type === 'forecast')?.date} stroke="#666" strokeDasharray="3 3" label="Today" />
+          <ReferenceLine
+            x={forecastData.find((d) => d.type === 'forecast')?.date}
+            stroke="#666"
+            strokeDasharray="3 3"
+            label="Today"
+          />
 
           {/* Historical data */}
           <Line
@@ -228,9 +233,9 @@ export function RiskForecast({ riskStats }: RiskForecastProps) {
       {/* Methodology Note */}
       <div className="mt-4 p-3 rounded-lg bg-muted/30 border border-dashed">
         <p className="text-xs text-muted-foreground">
-          <span className="font-semibold">Prediction Methodology:</span> Linear regression analysis with
-          confidence intervals. Predictions become less certain further into the future (shown by
-          expanding confidence bands).
+          <span className="font-semibold">Prediction Methodology:</span> Linear regression analysis
+          with confidence intervals. Predictions become less certain further into the future (shown
+          by expanding confidence bands).
         </p>
       </div>
     </div>

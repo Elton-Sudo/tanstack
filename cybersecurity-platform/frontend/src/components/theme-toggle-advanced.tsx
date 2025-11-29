@@ -15,9 +15,7 @@ export function ThemeToggleAdvanced() {
   }, []);
 
   if (!mounted) {
-    return (
-      <div className="rounded-lg bg-muted animate-pulse h-10 w-32" />
-    );
+    return <div className="rounded-lg bg-muted animate-pulse h-10 w-32" />;
   }
 
   const currentTheme = theme === 'system' ? systemTheme : theme;
@@ -134,8 +132,8 @@ export function ThemeToggleAdvanced() {
 
             <div className="p-4 border-t bg-muted/30">
               <p className="text-xs text-muted-foreground">
-                <span className="font-semibold">Tip:</span> System theme automatically switches based
-                on your device settings
+                <span className="font-semibold">Tip:</span> System theme automatically switches
+                based on your device settings
               </p>
             </div>
           </div>
@@ -162,11 +160,7 @@ export function ThemeToggleSimple() {
       className="rounded-lg p-2 hover:bg-accent transition-colors"
       aria-label="Toggle theme"
     >
-      {theme === 'dark' ? (
-        <Sun className="h-5 w-5" />
-      ) : (
-        <Moon className="h-5 w-5" />
-      )}
+      {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
     </button>
   );
 }

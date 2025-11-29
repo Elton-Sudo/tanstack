@@ -6,83 +6,79 @@
 
 'use client';
 
-import { DashboardLayout } from '@/components/layout';
+import { ActivityFeed } from '@/components/activity-feed';
 import { ServiceUnavailable } from '@/components/service-unavailable';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  AreaChartCard,
-  BarChartCard,
-  MetricCard,
-  PieChartCard,
-} from '@/components/visualizations';
+import { AreaChartCard, BarChartCard, MetricCard, PieChartCard } from '@/components/visualizations';
 import { useAnalytics } from '@/hooks/use-analytics';
-import {
-  AlertTriangle,
-  BookOpen,
-  CheckCircle2,
-  TrendingUp,
-  Users,
-} from 'lucide-react';
+import { AlertTriangle, BookOpen, CheckCircle2, Users } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { useDashboardMetrics } = useAnalytics();
+  const { useDashboardMetrics, useTenantRiskStats, usePhishingTenantStats } = useAnalytics();
   const { data, isLoading, isError, refetch } = useDashboardMetrics();
+  const { data: riskStats } = useTenantRiskStats();
+  const { data: phishingStats } = usePhishingTenantStats();
 
   // Show loading state
   if (isLoading) {
     return (
-      <DashboardLayout title="Dashboard" subtitle="Loading...">
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="h-40 animate-pulse rounded-lg border bg-card" />
           ))}
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   // Show error state
   if (isError) {
     return (
-      <DashboardLayout
-        title="Dashboard"
-        subtitle="Overview of your cybersecurity training platform"
-      >
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">Overview of your cybersecurity training platform</p>
+        </div>
         <ServiceUnavailable service="Reporting" onRetry={() => refetch()} />
-      </DashboardLayout>
+      </div>
     );
   }
 
-  // Sample data for charts (in production, this would come from the API)
-  const trainingProgressData = [
-    { month: 'Jan', completed: 65, enrolled: 100 },
-    { month: 'Feb', completed: 75, enrolled: 120 },
-    { month: 'Mar', completed: 85, enrolled: 140 },
-    { month: 'Apr', completed: 95, enrolled: 150 },
-    { month: 'May', completed: 110, enrolled: 160 },
-    { month: 'Jun', completed: 125, enrolled: 180 },
-  ];
+  // Transform API data for charts
+  const trainingProgressData =
+    data?.trendData?.months?.map((month) => ({
+      month: month.month,
+      completed: month.completions,
+      enrolled: month.enrollments,
+    })) || [];
 
-  const riskDistributionData = [
-    { name: 'Low Risk', value: 45, color: '#8CB841' },
-    { name: 'Medium Risk', value: 30, color: '#3B8EDE' },
-    { name: 'High Risk', value: 20, color: '#F5C242' },
-    { name: 'Critical', value: 5, color: '#E86A33' },
-  ];
+  const riskDistributionData = riskStats
+    ? [
+        { name: 'Low Risk', value: riskStats.lowRiskUsers, color: '#8CB841' },
+        { name: 'Medium Risk', value: riskStats.mediumRiskUsers, color: '#3B8EDE' },
+        { name: 'High Risk', value: riskStats.highRiskUsers, color: '#F5C242' },
+        { name: 'Critical', value: riskStats.criticalRiskUsers, color: '#E86A33' },
+      ]
+    : [];
 
-  const departmentData = [
-    { department: 'IT', score: 85 },
-    { department: 'HR', score: 72 },
-    { department: 'Finance', score: 68 },
-    { department: 'Sales', score: 78 },
-    { department: 'Operations', score: 80 },
-  ];
+  const departmentData =
+    data?.departmentMetrics?.map((dept) => ({
+      department: dept.departmentName,
+      score: Math.round(dept.completionRate),
+    })) || [];
 
   return (
-    <DashboardLayout
-      title="Dashboard"
-      subtitle="Overview of your cybersecurity training platform"
-    >
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="text-muted-foreground">Overview of your cybersecurity training platform</p>
+      </div>
+
       {/* Hero Metrics Section */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
@@ -159,70 +155,10 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Recent Activity */}
+      {/* Live Security Activity */}
       <div className="mt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                {
-                  action: 'User completed "Phishing Awareness Training"',
-                  time: '2 hours ago',
-                  icon: CheckCircle2,
-                  color: 'success',
-                },
-                {
-                  action: 'New user enrolled in "Data Protection Course"',
-                  time: '4 hours ago',
-                  icon: Users,
-                  color: 'primary',
-                },
-                {
-                  action: 'Risk assessment completed for IT department',
-                  time: '6 hours ago',
-                  icon: AlertTriangle,
-                  color: 'warning',
-                },
-                {
-                  action: 'Monthly compliance report generated',
-                  time: '1 day ago',
-                  icon: BookOpen,
-                  color: 'neutral',
-                },
-                {
-                  action: 'System backup completed successfully',
-                  time: '1 day ago',
-                  icon: CheckCircle2,
-                  color: 'success',
-                },
-              ].map((activity, i) => {
-                const Icon = activity.icon;
-                const colorClasses = {
-                  success: 'bg-brand-green-100 text-brand-green-600 dark:bg-brand-green-950 dark:text-brand-green-400',
-                  primary: 'bg-brand-blue-100 text-brand-blue-600 dark:bg-brand-blue-950 dark:text-brand-blue-400',
-                  warning: 'bg-brand-yellowGold-100 text-brand-yellowGold-700 dark:bg-brand-yellowGold-950 dark:text-brand-yellowGold-400',
-                  neutral: 'bg-muted text-muted-foreground',
-                };
-
-                return (
-                  <div key={i} className="flex items-start space-x-4">
-                    <div className={`rounded-lg p-2 ${colorClasses[activity.color as keyof typeof colorClasses]}`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium leading-none">{activity.action}</p>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        <ActivityFeed phishingStats={phishingStats} />
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

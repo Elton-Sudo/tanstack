@@ -51,10 +51,7 @@ const renderCustomLegend = (props: any) => {
     <div className="flex flex-wrap justify-center gap-4 mt-4">
       {payload.map((entry: any, index: number) => (
         <div key={`legend-${index}`} className="flex items-center gap-2">
-          <div
-            className="h-3 w-3 rounded-full"
-            style={{ backgroundColor: entry.color }}
-          />
+          <div className="h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
           <span className="text-sm text-muted-foreground">
             {entry.value}: {entry.payload.value}
           </span>
@@ -104,15 +101,10 @@ export default function PieChartCard({
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
-              label={({ name, percent }) =>
-                `${name} ${(percent * 100).toFixed(0)}%`
-              }
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
             >
               {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color || getColorByIndex(index)}
-                />
+                <Cell key={`cell-${index}`} fill={entry.color || getColorByIndex(index)} />
               ))}
             </Pie>
             <Tooltip {...tooltipConfig} />
