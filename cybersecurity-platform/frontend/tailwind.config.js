@@ -297,6 +297,26 @@ module.exports = {
             opacity: 1,
           },
         },
+        'slide-in-right': {
+          from: {
+            transform: 'translateX(100%)',
+            opacity: 0,
+          },
+          to: {
+            transform: 'translateX(0)',
+            opacity: 1,
+          },
+        },
+        'slide-out-right': {
+          from: {
+            transform: 'translateX(0)',
+            opacity: 1,
+          },
+          to: {
+            transform: 'translateX(100%)',
+            opacity: 0,
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -305,6 +325,8 @@ module.exports = {
         'fade-in': 'fade-in 0.3s ease-out',
         'slide-up': 'slide-up 0.3s ease-out',
         'slide-down': 'slide-down 0.3s ease-out',
+        'slide-in-right': 'slide-in-right 0.2s ease-out',
+        'slide-out-right': 'slide-out-right 0.2s ease-in',
       },
     },
   },
