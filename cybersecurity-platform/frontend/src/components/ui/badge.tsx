@@ -46,12 +46,13 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
             'border border-muted-foreground/30 text-muted-foreground bg-transparent':
               variant === 'default' && badgeStyle === 'outline',
 
-            // Primary (Blue) variant
+            // Primary & Info (Blue) variant - info is the same as primary
             'bg-brand-blue-100 text-brand-blue-700 dark:bg-brand-blue-950 dark:text-brand-blue-300':
-              variant === 'primary' && badgeStyle === 'soft',
-            'bg-brand-blue-500 text-white': variant === 'primary' && badgeStyle === 'solid',
+              (variant === 'primary' || variant === 'info') && badgeStyle === 'soft',
+            'bg-brand-blue-500 text-white':
+              (variant === 'primary' || variant === 'info') && badgeStyle === 'solid',
             'border border-brand-blue-500 text-brand-blue-600 bg-transparent dark:text-brand-blue-400':
-              variant === 'primary' && badgeStyle === 'outline',
+              (variant === 'primary' || variant === 'info') && badgeStyle === 'outline',
 
             // Secondary variant
             'bg-secondary text-secondary-foreground':
@@ -81,13 +82,6 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
             'bg-brand-orangeRed-500 text-white': variant === 'error' && badgeStyle === 'solid',
             'border border-brand-orangeRed-500 text-brand-orangeRed-600 bg-transparent dark:text-brand-orangeRed-400':
               variant === 'error' && badgeStyle === 'outline',
-
-            // Info (Blue) variant - same as primary
-            'bg-brand-blue-100 text-brand-blue-700 dark:bg-brand-blue-950 dark:text-brand-blue-300':
-              variant === 'info' && badgeStyle === 'soft',
-            'bg-brand-blue-500 text-white': variant === 'info' && badgeStyle === 'solid',
-            'border border-brand-blue-500 text-brand-blue-600 bg-transparent dark:text-brand-blue-400':
-              variant === 'info' && badgeStyle === 'outline',
           },
 
           className,

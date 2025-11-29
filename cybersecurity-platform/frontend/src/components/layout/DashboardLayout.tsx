@@ -51,7 +51,7 @@ export default function DashboardLayout({
       <div
         className={cn(
           'flex flex-1 flex-col overflow-hidden transition-all duration-300',
-          collapsed ? 'md:ml-16' : 'md:ml-64',
+          collapsed ? 'md:ml-[72px]' : 'md:ml-[280px]',
         )}
       >
         {/* Top Navbar */}

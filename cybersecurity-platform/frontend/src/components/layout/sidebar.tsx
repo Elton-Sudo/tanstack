@@ -58,7 +58,7 @@ export default function Sidebar() {
         className={cn(
           'fixed left-0 top-0 z-50 h-screen border-r bg-background transition-all duration-300',
           'md:relative md:translate-x-0',
-          collapsed ? 'w-16' : 'w-64',
+          collapsed ? 'w-[72px]' : 'w-[280px]',
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
         )}
       >
@@ -68,11 +68,11 @@ export default function Sidebar() {
             {!collapsed && (
               <div className="flex items-center gap-2">
                 <div className="relative h-8 w-8">
-                  <div className="flex h-8 w-8 items-center justify-center rounded bg-brand-blue">
-                    <span className="text-lg font-bold text-white">C</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded bg-brand-blue-500">
+                    <span className="text-lg font-bold text-white">S</span>
                   </div>
                 </div>
-                <span className="font-bold text-foreground">CyberSec</span>
+                <span className="font-bold text-foreground">SWIIFF</span>
               </div>
             )}
 
@@ -94,8 +94,8 @@ export default function Sidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto px-2 py-4">
-            <ul className="space-y-1">
+          <nav className="flex-1 overflow-y-auto px-4 py-4">
+            <ul className="space-y-2">
               {filteredNavigation.map((item) => (
                 <SidebarItem
                   key={item.id}
@@ -179,11 +179,12 @@ function SidebarItem({ item, pathname, collapsed, onNavigate, level = 0 }: Sideb
         href={item.href}
         onClick={handleClick}
         className={cn(
-          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-          'hover:bg-accent hover:text-accent-foreground',
-          isActive && 'bg-brand-blue text-white hover:bg-brand-blue/90',
-          isParentActive && !isActive && 'bg-accent',
-          collapsed && 'justify-center',
+          'relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
+          'hover:bg-muted/50 dark:hover:bg-muted/20',
+          isActive &&
+            'border-l-4 border-l-brand-blue-500 bg-brand-blue-50 text-brand-blue-700 dark:bg-brand-blue-950/30 dark:text-brand-blue-300',
+          isParentActive && !isActive && 'bg-muted/30',
+          collapsed && 'justify-center px-2',
           level > 0 && 'ml-4',
         )}
         title={collapsed ? item.label : undefined}
@@ -193,7 +194,7 @@ function SidebarItem({ item, pathname, collapsed, onNavigate, level = 0 }: Sideb
           <>
             <span className="flex-1">{item.label}</span>
             {item.badge && (
-              <span className="rounded-full bg-brand-blue px-2 py-0.5 text-xs text-white">
+              <span className="rounded-full bg-brand-blue-500 px-2 py-0.5 text-xs font-medium text-white">
                 {item.badge}
               </span>
             )}
