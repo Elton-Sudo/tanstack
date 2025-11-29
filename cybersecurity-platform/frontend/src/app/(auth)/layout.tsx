@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { ReactNode } from 'react';
 
 interface AuthLayoutProps {
@@ -8,19 +9,31 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-brand-blue via-brand-green to-brand-orange p-12 flex-col justify-between">
-        <div>
-          <div className="flex items-center space-x-2 mb-8">
-            <div className="flex space-x-1">
-              <div className="h-12 w-12 rounded-full bg-white flex items-center justify-center text-brand-blue font-bold text-xl">
-                C
-              </div>
+      <div
+        className="hidden lg:flex lg:w-1/2 p-12 flex-col justify-between relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, #3B8EDE 0%, #8CB841 50%, #E86A33 100%)',
+        }}
+      >
+        {/* Decorative overlay */}
+        <div className="absolute inset-0 bg-black/10" />
+
+        <div className="relative z-10">
+          <div className="flex items-center space-x-3 mb-8">
+            <div className="relative h-12 w-12 bg-white rounded-lg p-2">
+              <Image
+                src="/images/swiiff-icon.png"
+                alt="SWIIFF"
+                fill
+                className="object-contain"
+                unoptimized
+              />
             </div>
-            <span className="text-white text-2xl font-bold">CyberSec Platform</span>
+            <span className="text-white text-2xl font-bold">CyberSecurity Platform</span>
           </div>
         </div>
 
-        <div className="space-y-6 text-white">
+        <div className="space-y-6 text-white relative z-10">
           <h1 className="text-4xl font-bold leading-tight">
             Empower Your Team with Cybersecurity Excellence
           </h1>
@@ -65,14 +78,26 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           </div>
         </div>
 
-        <div className="flex items-center space-x-6 text-white/80 text-sm">
+        <div className="flex items-center space-x-6 text-white/90 text-sm relative z-10">
           <div className="flex space-x-2">
-            <div className="h-3 w-3 rounded-full bg-brand-blue border-2 border-white" />
-            <div className="h-3 w-3 rounded-full bg-brand-green border-2 border-white" />
-            <div className="h-3 w-3 rounded-full bg-brand-orange border-2 border-white" />
-            <div className="h-3 w-3 rounded-full bg-brand-red border-2 border-white" />
+            <div
+              className="h-3 w-3 rounded-full border-2 border-white"
+              style={{ backgroundColor: '#F5C242' }}
+            />
+            <div
+              className="h-3 w-3 rounded-full border-2 border-white"
+              style={{ backgroundColor: '#E86A33' }}
+            />
+            <div
+              className="h-3 w-3 rounded-full border-2 border-white"
+              style={{ backgroundColor: '#3B8EDE' }}
+            />
+            <div
+              className="h-3 w-3 rounded-full border-2 border-white"
+              style={{ backgroundColor: '#8CB841' }}
+            />
           </div>
-          <span>© 2025 CyberSec Platform</span>
+          <span className="font-medium">© 2025 SWIIFF Security • CyberSecurity Platform</span>
         </div>
       </div>
 
@@ -81,11 +106,20 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden mb-8 flex justify-center">
-            <div className="flex items-center space-x-2">
-              <div className="h-10 w-10 rounded-full bg-brand-blue flex items-center justify-center text-white font-bold">
-                C
+            <div className="flex items-center space-x-3">
+              <div
+                className="relative h-10 w-10 rounded-lg p-2"
+                style={{ backgroundColor: '#3B8EDE' }}
+              >
+                <Image
+                  src="/images/swiiff-icon.png"
+                  alt="SWIIFF"
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
               </div>
-              <span className="text-xl font-bold">CyberSec Platform</span>
+              <span className="text-xl font-bold">CyberSecurity Platform</span>
             </div>
           </div>
 

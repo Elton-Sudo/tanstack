@@ -1,8 +1,8 @@
 'use client';
 
-import { Logo } from '@/components/shared/Logo';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -52,20 +52,34 @@ export function LoginForm({ onSubmit, isPending = false }: LoginFormProps) {
   });
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 px-4 py-12">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 px-4 py-12 relative overflow-hidden">
+      {/* Background decorative elements with SWIIF colors */}
+      <div className="absolute top-0 left-0 w-64 h-64 rounded-full opacity-20 blur-3xl" style={{ backgroundColor: '#F5C242' }} />
+      <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ backgroundColor: '#3B8EDE' }} />
+      <div className="absolute top-1/2 right-1/4 w-48 h-48 rounded-full opacity-20 blur-3xl" style={{ backgroundColor: '#8CB841' }} />
+
       {/* Theme Toggle - Top Right */}
-      <div className="absolute right-4 top-4">
+      <div className="absolute right-4 top-4 z-10">
         <ThemeToggle />
       </div>
 
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Logo */}
         <div className="flex justify-center">
-          <Logo width={180} height={48} href="/" />
+          <div className="relative h-12 w-[180px]">
+            <Image
+              src="/images/swiiff-logo.png"
+              alt="SWIIFF Security"
+              fill
+              className="object-contain"
+              priority
+              unoptimized
+            />
+          </div>
         </div>
 
         {/* Login Card */}
-        <Card className="shadow-lg">
+        <Card className="shadow-xl border-t-4" style={{ borderTopColor: '#3B8EDE' }}>
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
             <CardDescription>Enter your credentials to access your account</CardDescription>
@@ -166,9 +180,35 @@ export function LoginForm({ onSubmit, isPending = false }: LoginFormProps) {
         </Card>
 
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground">
-          Protected by enterprise-grade security
-        </p>
+        <div className="space-y-4">
+          <div className="flex items-center justify-center gap-2">
+            <div className="relative h-6 w-6">
+              <Image
+                src="/images/swiiff-icon.png"
+                alt="SWIIFF"
+                fill
+                className="object-contain"
+                unoptimized
+              />
+            </div>
+            <span className="text-sm font-medium">CyberSecurity Platform</span>
+          </div>
+
+          {/* Brand dots and info */}
+          <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#F5C242' }} />
+              <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#E86A33' }} />
+              <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#3B8EDE' }} />
+              <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#8CB841' }} />
+            </div>
+            <span>Enterprise-grade security training</span>
+          </div>
+
+          <p className="text-center text-xs text-muted-foreground">
+            © {new Date().getFullYear()} SWIIFF Security. All rights reserved.
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 'use client';
 
-import { Logo } from '@/components/shared/Logo';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { useTenantBranding } from '@/hooks/useTenantBranding';
 import { useAuthStore } from '@/store/auth.store';
@@ -33,16 +32,14 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Menu className="h-6 w-6" />
         </button>
 
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <Link href="/dashboard" className="flex items-center space-x-2">
-            {logo ? (
+        {/* Logo - Custom tenant branding (empty by default) */}
+        {logo && (
+          <div className="flex items-center space-x-2">
+            <Link href="/dashboard" className="flex items-center space-x-2">
               <img src={logo} alt={name || 'Logo'} className="h-8 w-auto" />
-            ) : (
-              <Logo width={140} height={32} href="/dashboard" />
-            )}
-          </Link>
-        </div>
+            </Link>
+          </div>
+        )}
 
         {/* Spacer */}
         <div className="flex-1" />

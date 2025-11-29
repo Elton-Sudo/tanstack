@@ -1,6 +1,5 @@
 'use client';
 
-import { Logo } from '@/components/shared/Logo';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useResetPassword } from '@/hooks/useAuth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, Check, Eye, EyeOff, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -126,7 +126,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <div className="w-full max-w-md space-y-8">
           {/* Logo */}
           <div className="flex justify-center">
-            <Logo width={180} height={48} href="/" />
+            <div className="relative h-12 w-[180px]"><Image src="/images/swiiff-logo.png" alt="SWIIFF Security" fill className="object-contain" priority unoptimized /></div>
           </div>
 
           {/* Success Card */}
@@ -165,7 +165,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="flex justify-center">
-          <Logo width={180} height={48} href="/" />
+          <div className="relative h-12 w-[180px]"><Image src="/images/swiiff-logo.png" alt="SWIIFF Security" fill className="object-contain" priority unoptimized /></div>
         </div>
 
         {/* Reset Password Card */}

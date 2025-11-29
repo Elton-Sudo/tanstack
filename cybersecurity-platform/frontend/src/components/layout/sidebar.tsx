@@ -75,6 +75,7 @@ export default function Sidebar() {
                     fill
                     className="object-contain object-left"
                     priority
+                    unoptimized
                   />
                 </div>
               ) : (
@@ -85,6 +86,7 @@ export default function Sidebar() {
                     fill
                     className="object-contain"
                     priority
+                    unoptimized
                   />
                 </div>
               )}

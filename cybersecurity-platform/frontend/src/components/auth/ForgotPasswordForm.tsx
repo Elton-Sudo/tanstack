@@ -1,6 +1,5 @@
 'use client';
 
-import { Logo } from '@/components/shared/Logo';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useForgotPassword } from '@/hooks/useAuth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, Loader2, Mail } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -45,7 +45,7 @@ export function ForgotPasswordForm() {
         <div className="w-full max-w-md space-y-8">
           {/* Logo */}
           <div className="flex justify-center">
-            <Logo width={180} height={48} href="/" />
+            <div className="relative h-12 w-[180px]"><Image src="/images/swiiff-logo.png" alt="SWIIFF Security" fill className="object-contain" priority unoptimized /></div>
           </div>
 
           {/* Success Card */}
@@ -87,7 +87,7 @@ export function ForgotPasswordForm() {
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="flex justify-center">
-          <Logo width={180} height={48} href="/" />
+          <div className="relative h-12 w-[180px]"><Image src="/images/swiiff-logo.png" alt="SWIIFF Security" fill className="object-contain" priority unoptimized /></div>
         </div>
 
         {/* Forgot Password Card */}
