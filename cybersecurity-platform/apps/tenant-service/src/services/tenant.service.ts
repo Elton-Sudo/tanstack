@@ -428,4 +428,234 @@ export class TenantService {
     };
     return limits[plan];
   }
+
+  async getPlatformAnalytics() {
+    const [
+      totalTenants,
+      activeTenants,
+      trialTenants,
+      suspendedTenants,
+      expiredTenants,
+      totalUsers,
+      totalCourses,
+      totalEnrollments,
+    ] = await Promise.all([
+      this.prisma.tenant.count(),
+      this.prisma.tenant.count({ where: { status: TenantStatus.ACTIVE } }),
+      this.prisma.tenant.count({ where: { status: TenantStatus.TRIAL } }),
+      this.prisma.tenant.count({ where: { status: TenantStatus.SUSPENDED } }),
+      this.prisma.tenant.count({ where: { status: TenantStatus.EXPIRED } }),
+      this.prisma.user.count(),
+      this.prisma.course.count(),
+      this.prisma.enrollment.count(),
+    ]);
+
+    // Get new tenants in last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const newTenantsLast30Days = await this.prisma.tenant.count({
+      where: {
+        createdAt: {
+          gte: thirtyDaysAgo,
+        },
+      },
+    });
+
+    // Get tenant distribution by plan
+    const tenantsByPlan = await this.prisma.tenant.groupBy({
+      by: ['subscriptionPlan'],
+      _count: true,
+    });
+
+    const planDistribution = tenantsByPlan.reduce(
+      (acc, item) => {
+        acc[item.subscriptionPlan] = item._count;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    // Get growth trend (last 12 months)
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+    const monthlyGrowth = await this.prisma.tenant.groupBy({
+      by: ['createdAt'],
+      where: {
+        createdAt: {
+          gte: oneYearAgo,
+        },
+      },
+      _count: true,
+    });
+
+    return {
+      overview: {
+        totalTenants,
+        activeTenants,
+        trialTenants,
+        suspendedTenants,
+        expiredTenants,
+        newTenantsLast30Days,
+      },
+      platformStats: {
+        totalUsers,
+        totalCourses,
+        totalEnrollments,
+        averageUsersPerTenant: totalTenants > 0 ? Math.round(totalUsers / totalTenants) : 0,
+        averageCoursesPerTenant: totalTenants > 0 ? Math.round(totalCourses / totalTenants) : 0,
+      },
+      planDistribution,
+      growth: {
+        monthlySignups: monthlyGrowth.length,
+      },
+    };
+  }
+
+  async getRevenueAnalytics() {
+    // Get all active subscriptions with pricing
+    const tenants = await this.prisma.tenant.findMany({
+      where: {
+        status: {
+          in: [TenantStatus.ACTIVE, TenantStatus.TRIAL],
+        },
+      },
+      select: {
+        id: true,
+        subscriptionPlan: true,
+        subscriptionStartDate: true,
+        subscriptionEndDate: true,
+        status: true,
+      },
+    });
+
+    const planPricing = {
+      [SubscriptionPlan.FREE]: 0,
+      [SubscriptionPlan.TRIAL]: 0,
+      [SubscriptionPlan.STARTER]: 499,
+      [SubscriptionPlan.PROFESSIONAL]: 1999,
+      [SubscriptionPlan.ENTERPRISE]: 9999,
+    };
+
+    // Calculate MRR (Monthly Recurring Revenue)
+    const mrr = tenants.reduce((sum, tenant) => {
+      return sum + (planPricing[tenant.subscriptionPlan as SubscriptionPlan] || 0);
+    }, 0);
+
+    // Calculate ARR (Annual Recurring Revenue)
+    const arr = mrr * 12;
+
+    // Revenue by plan
+    const revenueByPlan = await this.prisma.tenant.groupBy({
+      by: ['subscriptionPlan'],
+      where: {
+        status: TenantStatus.ACTIVE,
+      },
+      _count: true,
+    });
+
+    const planRevenue = revenueByPlan.map((item) => ({
+      plan: item.subscriptionPlan,
+      tenantCount: item._count,
+      monthlyRevenue: item._count * (planPricing[item.subscriptionPlan as SubscriptionPlan] || 0),
+      annualRevenue:
+        item._count * (planPricing[item.subscriptionPlan as SubscriptionPlan] || 0) * 12,
+    }));
+
+    // Calculate churn rate (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const [churnedTenants, totalTenantsThirtyDaysAgo] = await Promise.all([
+      this.prisma.tenant.count({
+        where: {
+          status: {
+            in: [TenantStatus.SUSPENDED, TenantStatus.EXPIRED],
+          },
+          updatedAt: {
+            gte: thirtyDaysAgo,
+          },
+        },
+      }),
+      this.prisma.tenant.count({
+        where: {
+          createdAt: {
+            lt: thirtyDaysAgo,
+          },
+        },
+      }),
+    ]);
+
+    const churnRate =
+      totalTenantsThirtyDaysAgo > 0
+        ? ((churnedTenants / totalTenantsThirtyDaysAgo) * 100).toFixed(2)
+        : '0.00';
+
+    return {
+      revenue: {
+        mrr,
+        arr,
+        currency: 'ZAR',
+      },
+      planRevenue,
+      metrics: {
+        churnRate: parseFloat(churnRate),
+        activeSubscriptions: tenants.filter((t) => t.status === TenantStatus.ACTIVE).length,
+        trialSubscriptions: tenants.filter((t) => t.status === TenantStatus.TRIAL).length,
+      },
+    };
+  }
+
+  async bulkSuspend(tenantIds: string[], reason?: string) {
+    const results = {
+      successful: [] as string[],
+      failed: [] as { id: string; error: string }[],
+    };
+
+    for (const id of tenantIds) {
+      try {
+        await this.suspend(id, reason);
+        results.successful.push(id);
+      } catch (error) {
+        results.failed.push({
+          id,
+          error: error.message,
+        });
+      }
+    }
+
+    this.logger.log(
+      `Bulk suspend completed: ${results.successful.length} successful, ${results.failed.length} failed`,
+      'TenantService',
+    );
+
+    return results;
+  }
+
+  async bulkActivate(tenantIds: string[]) {
+    const results = {
+      successful: [] as string[],
+      failed: [] as { id: string; error: string }[],
+    };
+
+    for (const id of tenantIds) {
+      try {
+        await this.activate(id);
+        results.successful.push(id);
+      } catch (error) {
+        results.failed.push({
+          id,
+          error: error.message,
+        });
+      }
+    }
+
+    this.logger.log(
+      `Bulk activate completed: ${results.successful.length} successful, ${results.failed.length} failed`,
+      'TenantService',
+    );
+
+    return results;
+  }
 }

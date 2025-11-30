@@ -4,16 +4,21 @@
  */
 
 import {
+  Activity,
   Award,
   BarChart3,
   Bell,
   BookOpen,
+  Building2,
   ClipboardCheck,
+  DollarSign,
   FileText,
   GraduationCap,
   LayoutDashboard,
+  Palette,
   Settings,
   Shield,
+  UserCog,
   Users,
   type LucideIcon,
 } from 'lucide-react';
@@ -135,6 +140,55 @@ export const navigationItems: NavigationItem[] = [
     ],
   },
 
+  // Team Management (Tenant Admin/Manager only)
+  {
+    id: 'manage',
+    label: 'Team Management',
+    icon: Users,
+    href: '#',
+    description: 'Manage your team and resources',
+    requiredRole: ['TENANT_ADMIN', 'MANAGER'],
+    children: [
+      {
+        id: 'manage-dashboard',
+        label: 'Team Dashboard',
+        icon: LayoutDashboard,
+        href: '/manage',
+        description: 'Team overview and metrics',
+      },
+      {
+        id: 'manage-users',
+        label: 'User Management',
+        icon: Users,
+        href: '/manage/users',
+        description: 'Manage team members',
+      },
+      {
+        id: 'manage-courses',
+        label: 'Course Management',
+        icon: BookOpen,
+        href: '/manage/courses',
+        description: 'Manage and assign courses',
+      },
+      {
+        id: 'manage-branding',
+        label: 'Branding',
+        icon: Palette,
+        href: '/settings/branding',
+        description: 'Customize appearance',
+        requiredRole: ['TENANT_ADMIN'],
+      },
+      {
+        id: 'manage-roles',
+        label: 'Roles & Permissions',
+        icon: UserCog,
+        href: '/settings/roles',
+        description: 'Manage user roles',
+        requiredRole: ['TENANT_ADMIN'],
+      },
+    ],
+  },
+
   // Users (Admin only)
   {
     id: 'users',
@@ -143,6 +197,46 @@ export const navigationItems: NavigationItem[] = [
     href: '/users',
     description: 'User management',
     requiredRole: ['TENANT_ADMIN', 'SUPER_ADMIN'],
+  },
+
+  // Super Admin Section
+  {
+    id: 'admin',
+    label: 'Administration',
+    icon: Shield,
+    href: '#',
+    description: 'Platform administration',
+    requiredRole: ['SUPER_ADMIN'],
+    children: [
+      {
+        id: 'admin-platform',
+        label: 'Platform Analytics',
+        icon: Activity,
+        href: '/admin/platform',
+        description: 'Platform-wide analytics',
+      },
+      {
+        id: 'admin-tenants',
+        label: 'Tenant Management',
+        icon: Building2,
+        href: '/admin/tenants',
+        description: 'Manage all tenants',
+      },
+      {
+        id: 'admin-revenue',
+        label: 'Revenue Analytics',
+        icon: DollarSign,
+        href: '/admin/revenue',
+        description: 'Financial metrics',
+      },
+      {
+        id: 'admin-users',
+        label: 'User Management',
+        icon: Users,
+        href: '/admin/users',
+        description: 'Manage all users',
+      },
+    ],
   },
 
   // Notifications

@@ -153,4 +153,45 @@ export class TenantController {
     const tenantId = userRole === 'SUPER_ADMIN' ? id : userTenantId;
     return this.tenantService.getStats(tenantId);
   }
+
+  @Get('analytics/platform')
+  @Roles('SUPER_ADMIN')
+  @ApiOperation({ summary: 'Get platform-wide analytics for Super Admin dashboard' })
+  @ApiResponse({ status: 200, description: 'Returns platform-wide statistics' })
+  async getPlatformAnalytics() {
+    return this.tenantService.getPlatformAnalytics();
+  }
+
+  @Get('analytics/revenue')
+  @Roles('SUPER_ADMIN')
+  @ApiOperation({ summary: 'Get revenue analytics' })
+  @ApiResponse({ status: 200, description: 'Returns revenue statistics and trends' })
+  async getRevenueAnalytics() {
+    return this.tenantService.getRevenueAnalytics();
+  }
+
+  @Get('analytics/upcoming-expirations')
+  @Roles('SUPER_ADMIN')
+  @ApiOperation({ summary: 'Get tenants with upcoming subscription expirations' })
+  @ApiQuery({ name: 'days', required: false, type: Number, description: 'Number of days to look ahead' })
+  @ApiResponse({ status: 200, description: 'Returns list of tenants with upcoming expirations' })
+  async getUpcomingExpirations(@Query('days') days?: number) {
+    return this.tenantService.getUpcomingExpirations(days);
+  }
+
+  @Post('bulk/suspend')
+  @Roles('SUPER_ADMIN')
+  @ApiOperation({ summary: 'Suspend multiple tenants' })
+  @ApiResponse({ status: 200, description: 'Tenants suspended successfully' })
+  async bulkSuspend(@Body() body: { tenantIds: string[]; reason?: string }) {
+    return this.tenantService.bulkSuspend(body.tenantIds, body.reason);
+  }
+
+  @Post('bulk/activate')
+  @Roles('SUPER_ADMIN')
+  @ApiOperation({ summary: 'Activate multiple tenants' })
+  @ApiResponse({ status: 200, description: 'Tenants activated successfully' })
+  async bulkActivate(@Body() body: { tenantIds: string[] }) {
+    return this.tenantService.bulkActivate(body.tenantIds);
+  }
 }
