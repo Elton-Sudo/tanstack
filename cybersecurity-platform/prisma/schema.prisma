@@ -907,6 +907,24 @@ model Certificate {
   @@index([issuedAt])
 }
 
+model CertificateTemplate {
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  tenantId      String?  // null means global template
+  isDefault     Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  configuration Json     // Stores template design, colors, layout, etc.
+  createdBy     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([tenantId, isDefault])
+  @@index([tenantId])
+  @@index([isDefault])
+  @@index([isActive])
+}
+
 model PhishingEvent {
   id         String    @id @default(uuid())
   tenantId   String

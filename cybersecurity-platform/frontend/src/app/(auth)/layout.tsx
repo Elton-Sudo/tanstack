@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         {/* Decorative overlay */}
         <div className="absolute inset-0 bg-black/10" />
 
-        <div className="relative z-10">
+        {/* <div className="relative z-10">
           <div className="flex items-center space-x-3 mb-8">
             <div className="relative h-12 w-12 bg-white rounded-lg p-2">
               <Image
@@ -31,7 +31,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             </div>
             <span className="text-white text-2xl font-bold">CyberSecurity Platform</span>
           </div>
-        </div>
+        </div> */}
 
         <div className="space-y-6 text-white relative z-10">
           <h1 className="text-4xl font-bold leading-tight">
@@ -78,7 +78,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           </div>
         </div>
 
-        <div className="flex items-center space-x-6 text-white/90 text-sm relative z-10">
+        {/* <div className="flex items-center space-x-6 text-white/90 text-sm relative z-10">
           <div className="flex space-x-2">
             <div
               className="h-3 w-3 rounded-full border-2 border-white"
@@ -98,7 +98,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             />
           </div>
           <span className="font-medium">© 2025 SWIIFF Security • CyberSecurity Platform</span>
-        </div>
+        </div> */}
       </div>
 
       {/* Right side - Auth forms */}

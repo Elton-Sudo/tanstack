@@ -14,14 +14,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChartCard, BarChartCard, MetricCard, PieChartCard } from '@/components/visualizations';
 import { useAnalytics } from '@/hooks/use-analytics';
+import { useAuthStore } from '@/store/auth.store';
 import {
+  Activity,
   AlertTriangle,
   Award,
   BookOpen,
+  Building2,
   Calendar,
   CheckCircle2,
   ChevronRight,
   Clock,
+  DollarSign,
   Play,
   Star,
   Target,
@@ -31,28 +35,17 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// Mock user role - replace with actual auth context
-const useUserRole = () => {
-  return {
-    role: 'USER', // Change to 'TENANT_ADMIN', 'MANAGER', or 'SUPER_ADMIN' to see admin view
-    user: {
-      name: 'Sarah Johnson',
-      email: 'sarah.johnson@example.com',
-      role: 'Security Analyst',
-      department: 'IT Security',
-    },
-  };
-};
-
 // Employee/Learner Dashboard Component
 function EmployeeDashboard() {
-  const { user } = useUserRole();
+  const user = useAuthStore((state) => state.user);
+
+  if (!user) return null;
 
   // Mock data - will be replaced with API calls
   const userData = {
-    name: user.name,
-    role: user.role,
-    department: user.department,
+    name: `${user.firstName} ${user.lastName}`,
+    role: user.position || 'Team Member',
+    department: user.department || 'General',
     points: 2850,
     rank: 12,
     totalUsers: 187,
@@ -501,8 +494,8 @@ function EmployeeDashboard() {
   );
 }
 
-// Admin/Manager Dashboard Component
-function AdminDashboard() {
+// Tenant Admin/Manager Dashboard Component
+function TenantAdminDashboard() {
   const { useDashboardMetrics, useTenantRiskStats, usePhishingTenantStats } = useAnalytics();
   const { data, isLoading, isError, refetch } = useDashboardMetrics();
   const { data: riskStats } = useTenantRiskStats();
@@ -643,15 +636,231 @@ function AdminDashboard() {
   );
 }
 
+// Super Admin Dashboard Component
+function SuperAdminDashboard() {
+  const user = useAuthStore((state) => state.user);
+
+  if (!user) return null;
+
+  // Mock data for super admin - will be replaced with real API calls
+  const platformStats = {
+    activeTenants: 12,
+    totalUsers: 2450,
+    monthlyRevenue: 48750,
+    platformHealth: 98.5,
+  };
+
+  const tenantGrowthData = [
+    { month: 'Jan', tenants: 8, revenue: 32000 },
+    { month: 'Feb', tenants: 9, revenue: 36000 },
+    { month: 'Mar', tenants: 10, revenue: 40000 },
+    { month: 'Apr', tenants: 10, revenue: 40000 },
+    { month: 'May', tenants: 11, revenue: 44000 },
+    { month: 'Jun', tenants: 12, revenue: 48750 },
+  ];
+
+  const recentActivity = [
+    {
+      id: '1',
+      type: 'tenant',
+      message: 'New tenant "Acme Corp" created',
+      timestamp: '10 minutes ago',
+    },
+    {
+      id: '2',
+      type: 'revenue',
+      message: 'Subscription payment received from TechStart Inc',
+      timestamp: '1 hour ago',
+    },
+    {
+      id: '3',
+      type: 'alert',
+      message: 'Platform uptime restored to 99.9%',
+      timestamp: '2 hours ago',
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Welcome Header */}
+      <div>
+        <h1 className="text-3xl font-bold mb-2">Platform Administration</h1>
+        <p className="text-muted-foreground">
+          Welcome back, {user.firstName} {user.lastName} • Multi-tenant oversight and management
+        </p>
+      </div>
+
+      {/* Key Platform Metrics */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          title="Active Tenants"
+          value={platformStats.activeTenants}
+          subtitle="Organizations on platform"
+          trend={{ value: 20, isPositive: true, label: 'vs last month' }}
+          icon={Building2}
+          variant="primary"
+          animate
+        />
+        <MetricCard
+          title="Total Users"
+          value={platformStats.totalUsers.toLocaleString()}
+          subtitle="Across all tenants"
+          trend={{ value: 15.5, isPositive: true, label: 'vs last month' }}
+          icon={Users}
+          variant="success"
+          animate
+        />
+        <MetricCard
+          title="Monthly Revenue"
+          value={`$${(platformStats.monthlyRevenue / 1000).toFixed(1)}K`}
+          subtitle="MRR this month"
+          trend={{ value: 12.8, isPositive: true, label: 'vs last month' }}
+          icon={DollarSign}
+          variant="warning"
+          animate
+        />
+        <MetricCard
+          title="Platform Health"
+          value={`${platformStats.platformHealth}%`}
+          subtitle="System uptime"
+          icon={CheckCircle2}
+          variant="success"
+          animate
+        />
+      </div>
+
+      {/* Growth Charts */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <AreaChartCard
+          title="Platform Growth"
+          description="Tenant growth over time"
+          data={tenantGrowthData}
+          xAxisKey="month"
+          dataKeys={[{ key: 'tenants', name: 'Tenants', color: '#3B8EDE' }]}
+          height={300}
+        />
+
+        <AreaChartCard
+          title="Revenue Growth"
+          description="Monthly recurring revenue"
+          data={tenantGrowthData}
+          xAxisKey="month"
+          dataKeys={[{ key: 'revenue', name: 'Revenue ($)', color: '#8CB841' }]}
+          height={300}
+        />
+      </div>
+
+      {/* Recent Activity & Quick Actions */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Recent Platform Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {recentActivity.map((activity) => (
+              <div
+                key={activity.id}
+                className="flex items-start gap-3 p-3 rounded-lg bg-accent/50 hover:bg-accent transition-colors"
+              >
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{activity.message}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{activity.timestamp}</p>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start bg-brand-blue hover:bg-brand-blue/90" asChild>
+              <Link href="/admin/tenants">
+                <Building2 className="mr-2 h-4 w-4" />
+                Manage Tenants
+              </Link>
+            </Button>
+            <Button className="w-full justify-start" variant="outline" asChild>
+              <Link href="/admin/users">
+                <Users className="mr-2 h-4 w-4" />
+                View All Users
+              </Link>
+            </Button>
+            <Button className="w-full justify-start" variant="outline" asChild>
+              <Link href="/admin/revenue">
+                <DollarSign className="mr-2 h-4 w-4" />
+                Revenue Analytics
+              </Link>
+            </Button>
+            <Button className="w-full justify-start" variant="outline" asChild>
+              <Link href="/admin/certificate-templates">
+                <Award className="mr-2 h-4 w-4" />
+                Certificate Templates
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* System Alerts */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5" />
+            System Alerts
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">All systems operational</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // Main Dashboard - Role-aware
 export default function DashboardPage() {
-  const { role } = useUserRole();
+  const user = useAuthStore((state) => state.user);
+
+  // Loading state
+  if (!user) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-40 animate-pulse rounded-lg border bg-card" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   // Show employee dashboard for USER role
-  if (role === 'USER') {
+  if (user.role === 'USER') {
     return <EmployeeDashboard />;
   }
 
-  // Show admin dashboard for TENANT_ADMIN, MANAGER, SUPER_ADMIN
-  return <AdminDashboard />;
+  // Show super admin dashboard for SUPER_ADMIN
+  if (user.role === 'SUPER_ADMIN') {
+    return <SuperAdminDashboard />;
+  }
+
+  // Show tenant admin dashboard for TENANT_ADMIN, MANAGER, INSTRUCTOR
+  return <TenantAdminDashboard />;
 }

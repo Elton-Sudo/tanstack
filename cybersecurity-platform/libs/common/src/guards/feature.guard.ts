@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PrismaService } from '@lib/database';
+import { DatabaseService } from '@app/database';
 
 /**
  * Feature Guard
@@ -10,7 +10,7 @@ import { PrismaService } from '@lib/database';
 export class FeatureGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private prisma: PrismaService,
+    private prisma: DatabaseService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

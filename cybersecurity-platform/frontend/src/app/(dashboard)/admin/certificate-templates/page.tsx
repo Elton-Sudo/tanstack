@@ -21,6 +21,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { useState } from 'react';
+import SwiiffTemplateCard from './SwiiffTemplateCard';
 
 type TemplateStatus = 'Active' | 'Draft' | 'Archived';
 
@@ -277,6 +278,14 @@ export default function CertificateTemplatesPage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* SWIIFF Default Template - Always First */}
+            <SwiiffTemplateCard
+              onEdit={() => alert('SWIIFF template editing requires super admin access')}
+              onDuplicate={() => alert('Duplicating SWIIFF default template...')}
+              onDelete={() => alert('Cannot delete the default SWIIFF template')}
+            />
+
+            {/* Other Custom Templates */}
             {templates.map((template) => (
               <Card key={template.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>

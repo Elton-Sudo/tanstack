@@ -48,13 +48,14 @@ export const navigationItems: NavigationItem[] = [
     description: 'Overview and quick stats',
   },
 
-  // Learning Section
+  // Learning Section (Hidden from SUPER_ADMIN)
   {
     id: 'learning',
     label: 'Learning',
     icon: BookOpen,
     href: '#',
     description: 'Courses and learning paths',
+    requiredRole: ['USER', 'MANAGER', 'INSTRUCTOR', 'TENANT_ADMIN'],
     children: [
       {
         id: 'courses',
@@ -80,22 +81,24 @@ export const navigationItems: NavigationItem[] = [
     ],
   },
 
-  // Assessments
+  // Assessments (Hidden from SUPER_ADMIN)
   {
     id: 'assessments',
     label: 'Assessments',
     icon: ClipboardCheck,
     href: '/assessments',
     description: 'Tests and quizzes',
+    requiredRole: ['USER', 'MANAGER', 'INSTRUCTOR', 'TENANT_ADMIN'],
   },
 
-  // Certificates
+  // Certificates (Hidden from SUPER_ADMIN)
   {
     id: 'certificates',
     label: 'Certificates',
     icon: Award,
     href: '/certificates',
     description: 'Your earned certificates',
+    requiredRole: ['USER', 'MANAGER', 'INSTRUCTOR', 'TENANT_ADMIN'],
   },
 
   // Compliance
@@ -235,6 +238,13 @@ export const navigationItems: NavigationItem[] = [
         icon: Users,
         href: '/admin/users',
         description: 'Manage all users',
+      },
+      {
+        id: 'admin-certificates',
+        label: 'Certificate Templates',
+        icon: Award,
+        href: '/admin/certificate-templates',
+        description: 'Manage certificate templates',
       },
     ],
   },
