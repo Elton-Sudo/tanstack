@@ -9,6 +9,11 @@
 
 import { ActivityFeed } from '@/components/activity-feed';
 import { ServiceUnavailable } from '@/components/service-unavailable';
+import {
+  EmployeeDashboardSkeleton,
+  TenantAdminDashboardSkeleton,
+  SuperAdminDashboardSkeleton,
+} from '@/components/skeletons/DashboardSkeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -502,19 +507,7 @@ function TenantAdminDashboard() {
   const { data: phishingStats } = usePhishingTenantStats();
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-40 animate-pulse rounded-lg border bg-card" />
-          ))}
-        </div>
-      </div>
-    );
+    return <TenantAdminDashboardSkeleton />;
   }
 
   if (isError) {
@@ -834,21 +827,9 @@ function SuperAdminDashboard() {
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
 
-  // Loading state
+  // Loading state - show appropriate skeleton based on likely role
   if (!user) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-40 animate-pulse rounded-lg border bg-card" />
-          ))}
-        </div>
-      </div>
-    );
+    return <TenantAdminDashboardSkeleton />;
   }
 
   // Show employee dashboard for USER role

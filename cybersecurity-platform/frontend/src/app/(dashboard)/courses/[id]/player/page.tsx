@@ -1,9 +1,13 @@
 'use client';
 
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { CoursePlayerSkeleton } from '@/components/skeletons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { useCourses } from '@/hooks/use-courses';
+import { Chapter, Module } from '@/types/course';
 import {
   BookOpen,
   Check,
@@ -17,230 +21,191 @@ import {
   PlayCircle,
   StickyNote,
   X,
+  AlertCircle,
 } from 'lucide-react';
-import { use, useState } from 'react';
-
-interface Lesson {
-  id: string;
-  title: string;
-  duration: number; // in minutes
-  type: 'video' | 'reading' | 'quiz';
-  isCompleted: boolean;
-  content?: {
-    videoUrl?: string;
-    readingContent?: string;
-    quizQuestions?: number;
-  };
-}
-
-interface Chapter {
-  id: string;
-  title: string;
-  lessons: Lesson[];
-  isExpanded: boolean;
-}
+import Link from 'next/link';
+import { use, useCallback, useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface CoursePlayerPageProps {
   params: Promise<{ id: string }>;
 }
 
+interface ExtendedChapter extends Chapter {
+  moduleId: string;
+  type: 'video' | 'reading' | 'quiz';
+  isCompleted: boolean;
+}
+
 export default function CoursePlayerPage({ params }: CoursePlayerPageProps) {
   const { id: courseId } = use(params);
-  const [selectedLessonId, setSelectedLessonId] = useState('1-1');
+
+  // State management
+  const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
   const [showNotes, setShowNotes] = useState(false);
   const [showOutline, setShowOutline] = useState(true);
   const [notes, setNotes] = useState('');
   const [videoProgress, setVideoProgress] = useState(0);
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+  const [completedChapters, setCompletedChapters] = useState<Set<string>>(new Set());
 
-  // Mock course data - will be replaced with API calls
-  const courseData = {
-    id: courseId,
-    title: 'Advanced Threat Detection',
-    description: 'Deep dive into identifying sophisticated cyber threats',
-    instructor: 'Dr. Sarah Chen',
-    totalLessons: 12,
-    completedLessons: 8,
-    progress: 67,
-  };
+  // API hooks
+  const { useGetCourse, useGetModules, useMyEnrollments, useUpdateProgress } = useCourses();
+  const { data: course, isLoading: courseLoading, isError: courseError } = useGetCourse(courseId);
+  const {
+    data: modules,
+    isLoading: modulesLoading,
+    isError: modulesError,
+  } = useGetModules(courseId);
+  const { data: enrollments } = useMyEnrollments();
+  const updateProgressMutation = useUpdateProgress();
 
-  const [chapters, setChapters] = useState<Chapter[]>([
-    {
-      id: '1',
-      title: 'Introduction to Threat Detection',
-      isExpanded: true,
-      lessons: [
-        {
-          id: '1-1',
-          title: 'What is Threat Detection?',
-          duration: 12,
-          type: 'video',
-          isCompleted: true,
-          content: {
-            videoUrl: 'https://example.com/video1.mp4',
-          },
-        },
-        {
-          id: '1-2',
-          title: 'Types of Cyber Threats',
-          duration: 15,
-          type: 'video',
-          isCompleted: true,
-          content: {
-            videoUrl: 'https://example.com/video2.mp4',
-          },
-        },
-        {
-          id: '1-3',
-          title: 'Reading: Threat Landscape Overview',
-          duration: 10,
-          type: 'reading',
-          isCompleted: true,
-          content: {
-            readingContent: `
-# Threat Landscape Overview
+  // Find user's enrollment for this course
+  const enrollment = useMemo(
+    () => enrollments?.find((e) => e.courseId === courseId),
+    [enrollments, courseId],
+  );
 
-The modern threat landscape is constantly evolving. Understanding the various types of threats is crucial for effective detection and prevention.
+  // Transform modules and chapters
+  const transformedModules = useMemo(() => {
+    if (!modules) return [];
 
-## Key Threat Categories
+    return modules.map((module) => ({
+      ...module,
+      chapters:
+        module.chapters?.map((chapter) => ({
+          ...chapter,
+          moduleId: module.id,
+          type: chapter.videoUrl ? 'video' : ('reading' as 'video' | 'reading' | 'quiz'),
+          isCompleted: completedChapters.has(chapter.id),
+        })) || [],
+    }));
+  }, [modules, completedChapters]);
 
-1. **Malware**: Malicious software designed to damage or gain unauthorized access
-2. **Phishing**: Social engineering attacks via email or messaging
-3. **Ransomware**: Malware that encrypts data and demands payment
-4. **Advanced Persistent Threats (APTs)**: Long-term targeted attacks
-5. **Zero-day Exploits**: Attacks on previously unknown vulnerabilities
+  // Get all chapters in a flat list
+  const allChapters = useMemo(
+    () => transformedModules.flatMap((m) => m.chapters),
+    [transformedModules],
+  );
 
-## Emerging Threats
+  // Find selected chapter
+  const selectedChapter = useMemo(
+    () => allChapters.find((c) => c.id === selectedChapterId),
+    [allChapters, selectedChapterId],
+  );
 
-- AI-powered attacks
-- Supply chain compromises
-- IoT vulnerabilities
-- Cloud security challenges
+  // Navigation helpers
+  const currentChapterIndex = useMemo(
+    () => allChapters.findIndex((c) => c.id === selectedChapterId),
+    [allChapters, selectedChapterId],
+  );
+  const hasNext = currentChapterIndex < allChapters.length - 1;
+  const hasPrevious = currentChapterIndex > 0;
 
-Understanding these threats is the first step in building an effective detection strategy.
-            `,
-          },
-        },
-        {
-          id: '1-4',
-          title: 'Quiz: Introduction Assessment',
-          duration: 5,
-          type: 'quiz',
-          isCompleted: false,
-          content: {
-            quizQuestions: 10,
-          },
-        },
-      ],
-    },
-    {
-      id: '2',
-      title: 'Detection Techniques',
-      isExpanded: true,
-      lessons: [
-        {
-          id: '2-1',
-          title: 'Signature-based Detection',
-          duration: 18,
-          type: 'video',
-          isCompleted: true,
-          content: {
-            videoUrl: 'https://example.com/video3.mp4',
-          },
-        },
-        {
-          id: '2-2',
-          title: 'Anomaly-based Detection',
-          duration: 20,
-          type: 'video',
-          isCompleted: true,
-          content: {
-            videoUrl: 'https://example.com/video4.mp4',
-          },
-        },
-        {
-          id: '2-3',
-          title: 'Behavioral Analysis Techniques',
-          duration: 22,
-          type: 'video',
-          isCompleted: false,
-          content: {
-            videoUrl: 'https://example.com/video5.mp4',
-          },
-        },
-      ],
-    },
-    {
-      id: '3',
-      title: 'Advanced Topics',
-      isExpanded: false,
-      lessons: [
-        {
-          id: '3-1',
-          title: 'Machine Learning in Threat Detection',
-          duration: 25,
-          type: 'video',
-          isCompleted: false,
-          content: {
-            videoUrl: 'https://example.com/video6.mp4',
-          },
-        },
-        {
-          id: '3-2',
-          title: 'Real-time Threat Intelligence',
-          duration: 20,
-          type: 'video',
-          isCompleted: false,
-          content: {
-            videoUrl: 'https://example.com/video7.mp4',
-          },
-        },
-      ],
-    },
-  ]);
+  // Calculate overall progress
+  const overallProgress = useMemo(() => {
+    if (allChapters.length === 0) return 0;
+    const completed = allChapters.filter((c) => c.isCompleted).length;
+    return Math.round((completed / allChapters.length) * 100);
+  }, [allChapters]);
 
-  const selectedLesson = chapters.flatMap((c) => c.lessons).find((l) => l.id === selectedLessonId);
+  // Load notes from localStorage
+  useEffect(() => {
+    if (selectedChapterId) {
+      const savedNotes = localStorage.getItem(`notes-${courseId}-${selectedChapterId}`);
+      setNotes(savedNotes || '');
+    }
+  }, [selectedChapterId, courseId]);
 
-  const allLessons = chapters.flatMap((c) => c.lessons);
-  const currentLessonIndex = allLessons.findIndex((l) => l.id === selectedLessonId);
-  const hasNext = currentLessonIndex < allLessons.length - 1;
-  const hasPrevious = currentLessonIndex > 0;
+  // Save notes to localStorage
+  useEffect(() => {
+    if (selectedChapterId && notes) {
+      localStorage.setItem(`notes-${courseId}-${selectedChapterId}`, notes);
+    }
+  }, [notes, selectedChapterId, courseId]);
 
-  const toggleChapter = (chapterId: string) => {
-    setChapters((prev) =>
-      prev.map((chapter) =>
-        chapter.id === chapterId ? { ...chapter, isExpanded: !chapter.isExpanded } : chapter,
-      ),
-    );
-  };
+  // Load completed chapters from localStorage
+  useEffect(() => {
+    const savedCompleted = localStorage.getItem(`completed-${courseId}`);
+    if (savedCompleted) {
+      setCompletedChapters(new Set(JSON.parse(savedCompleted)));
+    }
+  }, [courseId]);
 
-  const markLessonComplete = (lessonId: string) => {
-    setChapters((prev) =>
-      prev.map((chapter) => ({
-        ...chapter,
-        lessons: chapter.lessons.map((lesson) =>
-          lesson.id === lessonId ? { ...lesson, isCompleted: true } : lesson,
-        ),
-      })),
-    );
-  };
+  // Save completed chapters to localStorage
+  useEffect(() => {
+    localStorage.setItem(`completed-${courseId}`, JSON.stringify([...completedChapters]));
+  }, [completedChapters, courseId]);
 
-  const handleNextLesson = () => {
+  // Auto-select first chapter on load
+  useEffect(() => {
+    if (allChapters.length > 0 && !selectedChapterId) {
+      setSelectedChapterId(allChapters[0].id);
+      // Expand first module
+      if (transformedModules[0]) {
+        setExpandedModules(new Set([transformedModules[0].id]));
+      }
+    }
+  }, [allChapters, selectedChapterId, transformedModules]);
+
+  // Auto-save progress to backend
+  useEffect(() => {
+    if (enrollment && overallProgress > enrollment.progress) {
+      const timeoutId = setTimeout(() => {
+        updateProgressMutation.mutate({
+          enrollmentId: enrollment.id,
+          progress: overallProgress,
+        });
+      }, 2000); // Debounce by 2 seconds
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [overallProgress, enrollment, updateProgressMutation]);
+
+  const toggleModule = useCallback((moduleId: string) => {
+    setExpandedModules((prev) => {
+      const next = new Set(prev);
+      if (next.has(moduleId)) {
+        next.delete(moduleId);
+      } else {
+        next.add(moduleId);
+      }
+      return next;
+    });
+  }, []);
+
+  const markChapterComplete = useCallback((chapterId: string) => {
+    setCompletedChapters((prev) => new Set([...prev, chapterId]));
+    toast.success('Chapter marked as complete!');
+  }, []);
+
+  const handleNextChapter = useCallback(() => {
     if (hasNext) {
-      const nextLesson = allLessons[currentLessonIndex + 1];
-      setSelectedLessonId(nextLesson.id);
-      // Mark current lesson as complete
-      markLessonComplete(selectedLessonId);
+      const nextChapter = allChapters[currentChapterIndex + 1];
+      setSelectedChapterId(nextChapter.id);
+      // Mark current chapter as complete
+      if (selectedChapterId) {
+        markChapterComplete(selectedChapterId);
+      }
+      // Expand the module containing the next chapter
+      setExpandedModules((prev) => new Set([...prev, nextChapter.moduleId]));
+      // Reset video progress
+      setVideoProgress(0);
     }
-  };
+  }, [hasNext, allChapters, currentChapterIndex, selectedChapterId, markChapterComplete]);
 
-  const handlePreviousLesson = () => {
+  const handlePreviousChapter = useCallback(() => {
     if (hasPrevious) {
-      const previousLesson = allLessons[currentLessonIndex - 1];
-      setSelectedLessonId(previousLesson.id);
+      const previousChapter = allChapters[currentChapterIndex - 1];
+      setSelectedChapterId(previousChapter.id);
+      // Expand the module containing the previous chapter
+      setExpandedModules((prev) => new Set([...prev, previousChapter.moduleId]));
+      // Reset video progress
+      setVideoProgress(0);
     }
-  };
+  }, [hasPrevious, allChapters, currentChapterIndex]);
 
-  const getLessonIcon = (type: Lesson['type']) => {
+  const getLessonIcon = (type: 'video' | 'reading' | 'quiz') => {
     switch (type) {
       case 'video':
         return <PlayCircle className="h-4 w-4" />;
@@ -251,34 +216,47 @@ Understanding these threats is the first step in building an effective detection
     }
   };
 
-  const renderLessonContent = () => {
-    if (!selectedLesson) return null;
+  const renderChapterContent = () => {
+    if (!selectedChapter) return null;
 
-    switch (selectedLesson.type) {
+    switch (selectedChapter.type) {
       case 'video':
         return (
           <div className="space-y-4">
             {/* Video Player Placeholder */}
             <div className="aspect-video bg-black rounded-lg flex items-center justify-center relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/20 to-purple-600/20" />
-              <div className="relative z-10 text-center text-white">
-                <PlayCircle className="h-24 w-24 mx-auto mb-4 opacity-80" />
-                <p className="text-lg font-medium mb-2">Video Player</p>
-                <p className="text-sm opacity-80">
-                  {selectedLesson.content?.videoUrl || 'No video URL'}
-                </p>
-                <div className="mt-6">
-                  <div className="w-96 mx-auto bg-white/20 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="h-full bg-white rounded-full transition-all"
-                      style={{ width: `${videoProgress}%` }}
-                    />
+              {selectedChapter.videoUrl ? (
+                <video
+                  className="w-full h-full"
+                  controls
+                  src={selectedChapter.videoUrl}
+                  onTimeUpdate={(e) => {
+                    const video = e.currentTarget;
+                    const progress = (video.currentTime / video.duration) * 100;
+                    setVideoProgress(Math.round(progress));
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <div className="relative z-10 text-center text-white">
+                  <PlayCircle className="h-24 w-24 mx-auto mb-4 opacity-80" />
+                  <p className="text-lg font-medium mb-2">Video Player</p>
+                  <p className="text-sm opacity-80">No video URL available</p>
+                  <div className="mt-6">
+                    <div className="w-96 mx-auto bg-white/20 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="h-full bg-white rounded-full transition-all"
+                        style={{ width: `${videoProgress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs mt-2 opacity-60">
+                      {videoProgress}% completed • {selectedChapter.duration || 0} min
+                    </p>
                   </div>
-                  <p className="text-xs mt-2 opacity-60">
-                    {videoProgress}% completed " {selectedLesson.duration} min
-                  </p>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Video Controls */}
@@ -286,22 +264,24 @@ Understanding these threats is the first step in building an effective detection
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  {selectedLesson.duration} minutes
+                  {selectedChapter.duration || 0} minutes
                 </span>
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setVideoProgress(Math.min(100, videoProgress + 10))}
-                >
-                  Simulate Progress +10%
-                </Button>
-                {!selectedLesson.isCompleted && videoProgress >= 90 && (
+                {!selectedChapter.videoUrl && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setVideoProgress(Math.min(100, videoProgress + 10))}
+                  >
+                    Simulate Progress +10%
+                  </Button>
+                )}
+                {!selectedChapter.isCompleted && videoProgress >= 90 && (
                   <Button
                     variant="default"
                     size="sm"
-                    onClick={() => markLessonComplete(selectedLessonId)}
+                    onClick={() => markChapterComplete(selectedChapter.id)}
                     className="bg-brand-green hover:bg-brand-green/90"
                   >
                     <Check className="mr-2 h-4 w-4" />
@@ -318,12 +298,17 @@ Understanding these threats is the first step in building an effective detection
           <div className="space-y-4">
             <Card>
               <CardContent className="pt-6">
-                <div
-                  className="prose prose-slate dark:prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{
-                    __html: selectedLesson.content?.readingContent || 'No content available',
-                  }}
-                />
+                {selectedChapter.content ? (
+                  <div
+                    className="prose prose-slate dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: selectedChapter.content }}
+                  />
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No content available for this chapter</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -331,12 +316,12 @@ Understanding these threats is the first step in building an effective detection
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  {selectedLesson.duration} min read
+                  {selectedChapter.duration || 0} min read
                 </span>
               </div>
-              {!selectedLesson.isCompleted && (
+              {!selectedChapter.isCompleted && (
                 <Button
-                  onClick={() => markLessonComplete(selectedLessonId)}
+                  onClick={() => markChapterComplete(selectedChapter.id)}
                   className="bg-brand-green hover:bg-brand-green/90"
                 >
                   <Check className="mr-2 h-4 w-4" />
@@ -354,17 +339,11 @@ Understanding these threats is the first step in building an effective detection
               <CardContent className="pt-6 text-center py-12">
                 <BookOpen className="h-16 w-16 mx-auto mb-4 text-brand-blue" />
                 <h3 className="text-xl font-bold mb-2">Assessment Quiz</h3>
-                <p className="text-muted-foreground mb-4">
-                  Test your knowledge with {selectedLesson.content?.quizQuestions} questions
-                </p>
+                <p className="text-muted-foreground mb-4">Test your knowledge from this module</p>
                 <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground mb-6">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    <span>{selectedLesson.duration} minutes</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    <span>{selectedLesson.content?.quizQuestions} questions</span>
+                    <span>{selectedChapter.duration || 15} minutes</span>
                   </div>
                 </div>
                 <Button size="lg" className="bg-brand-blue hover:bg-brand-blue/90">
@@ -378,182 +357,252 @@ Understanding these threats is the first step in building an effective detection
     }
   };
 
+  if (courseLoading || modulesLoading) {
+    return <CoursePlayerSkeleton />;
+  }
+
+  if (courseError || modulesError || !course) {
+    return (
+      <div className="space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Courses', href: '/courses' },
+            { label: 'Player', href: `/courses/${courseId}/player` },
+          ]}
+        />
+        <Card>
+          <CardContent className="py-12 text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Failed to load course</h3>
+            <p className="text-muted-foreground mb-4">
+              There was an error loading the course content. Please try again later.
+            </p>
+            <Button asChild>
+              <Link href="/courses">Back to Courses</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!enrollment) {
+    return (
+      <div className="space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Courses', href: '/courses' },
+            { label: course.title, href: `/courses/${courseId}` },
+          ]}
+        />
+        <Card>
+          <CardContent className="py-12 text-center">
+            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Not Enrolled</h3>
+            <p className="text-muted-foreground mb-4">
+              You need to enroll in this course before accessing the player.
+            </p>
+            <Button asChild>
+              <Link href={`/courses/${courseId}`}>View Course Details</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-[calc(100vh-4rem)] gap-6">
-      {/* Course Outline Sidebar */}
-      {showOutline && (
-        <div className="w-96 flex-shrink-0 border-r pr-6 overflow-y-auto">
-          <div className="sticky top-0 bg-background pb-4 mb-4 border-b">
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex-1">
-                <h2 className="font-bold text-lg line-clamp-2">{courseData.title}</h2>
-                <p className="text-sm text-muted-foreground">{courseData.instructor}</p>
+    <div className="space-y-4">
+      <Breadcrumbs
+        items={[
+          { label: 'Courses', href: '/courses' },
+          { label: course.title, href: `/courses/${courseId}` },
+          { label: 'Player', href: `/courses/${courseId}/player` },
+        ]}
+      />
+
+      <div className="flex h-[calc(100vh-8rem)] gap-6">
+        {/* Course Outline Sidebar */}
+        {showOutline && (
+          <div className="w-96 flex-shrink-0 border-r pr-6 overflow-y-auto">
+            <div className="sticky top-0 bg-background pb-4 mb-4 border-b">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1">
+                  <h2 className="font-bold text-lg line-clamp-2">{course.title}</h2>
+                  <p className="text-sm text-muted-foreground">{course.category}</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowOutline(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setShowOutline(false)}>
-                <X className="h-4 w-4" />
-              </Button>
+
+              {/* Progress Bar */}
+              <div className="mt-4">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">Course Progress</span>
+                  <span className="font-medium">{overallProgress}%</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-brand-blue rounded-full transition-all"
+                    style={{ width: `${overallProgress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {allChapters.filter((c) => c.isCompleted).length} of {allChapters.length} chapters
+                  completed
+                </p>
+              </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="mt-4">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Course Progress</span>
-                <span className="font-medium">{courseData.progress}%</span>
-              </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-brand-blue rounded-full transition-all"
-                  style={{ width: `${courseData.progress}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                {courseData.completedLessons} of {courseData.totalLessons} lessons completed
-              </p>
-            </div>
-          </div>
+            {/* Modules and Chapters */}
+            <div className="space-y-2">
+              {transformedModules.map((module, index) => (
+                <div key={module.id} className="border rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => toggleModule(module.id)}
+                    className="w-full flex items-center justify-between p-3 hover:bg-accent transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Module {index + 1}
+                      </span>
+                      <span className="font-medium text-sm">{module.title}</span>
+                    </div>
+                    {expandedModules.has(module.id) ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </button>
 
-          {/* Chapters and Lessons */}
-          <div className="space-y-2">
-            {chapters.map((chapter) => (
-              <div key={chapter.id} className="border rounded-lg overflow-hidden">
-                <button
-                  onClick={() => toggleChapter(chapter.id)}
-                  className="w-full flex items-center justify-between p-3 hover:bg-accent transition-colors"
-                >
-                  <span className="font-medium text-sm">{chapter.title}</span>
-                  {chapter.isExpanded ? (
-                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </button>
-
-                {chapter.isExpanded && (
-                  <div className="border-t">
-                    {chapter.lessons.map((lesson) => (
-                      <button
-                        key={lesson.id}
-                        onClick={() => setSelectedLessonId(lesson.id)}
-                        className={`w-full flex items-start gap-3 p-3 hover:bg-accent transition-colors ${
-                          selectedLessonId === lesson.id ? 'bg-accent' : ''
-                        }`}
-                      >
-                        <div
-                          className={`mt-0.5 flex-shrink-0 ${
-                            lesson.isCompleted ? 'text-brand-green' : 'text-muted-foreground'
+                  {expandedModules.has(module.id) && (
+                    <div className="border-t">
+                      {module.chapters.map((chapter, chapterIndex) => (
+                        <button
+                          key={chapter.id}
+                          onClick={() => setSelectedChapterId(chapter.id)}
+                          className={`w-full flex items-start gap-3 p-3 hover:bg-accent transition-colors ${
+                            selectedChapterId === chapter.id ? 'bg-accent' : ''
                           }`}
                         >
-                          {lesson.isCompleted ? (
-                            <Check className="h-4 w-4" />
-                          ) : (
-                            getLessonIcon(lesson.type)
-                          )}
-                        </div>
-                        <div className="flex-1 text-left">
-                          <p className="text-sm font-medium line-clamp-2">{lesson.title}</p>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{lesson.duration} min</span>
-                            {lesson.isCompleted && (
-                              <Badge variant="success" badgeStyle="outline">
-                                Completed
-                              </Badge>
+                          <div
+                            className={`mt-0.5 flex-shrink-0 ${
+                              chapter.isCompleted ? 'text-brand-green' : 'text-muted-foreground'
+                            }`}
+                          >
+                            {chapter.isCompleted ? (
+                              <Check className="h-4 w-4" />
+                            ) : (
+                              getLessonIcon(chapter.type)
                             )}
                           </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Lesson Header */}
-        <div className="flex items-start justify-between pb-4 mb-4 border-b">
-          <div className="flex-1">
-            {!showOutline && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowOutline(true)}
-                className="mb-2"
-              >
-                <List className="mr-2 h-4 w-4" />
-                Show Outline
-              </Button>
-            )}
-            <div className="flex items-center gap-3 mb-2">
-              {selectedLesson && getLessonIcon(selectedLesson.type)}
-              <h1 className="text-2xl font-bold">{selectedLesson?.title}</h1>
+                          <div className="flex-1 text-left">
+                            <p className="text-sm font-medium line-clamp-2">{chapter.title}</p>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{chapter.duration || 0} min</span>
+                              {chapter.isCompleted && (
+                                <Badge variant="success" className="text-xs">
+                                  Completed
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-            {selectedLesson?.isCompleted && (
-              <Badge variant="success" badgeStyle="solid">
-                <Check className="mr-1 h-3 w-3" />
-                Completed
-              </Badge>
-            )}
           </div>
-          <Button variant="outline" onClick={() => setShowNotes(!showNotes)}>
-            <StickyNote className="mr-2 h-4 w-4" />
-            {showNotes ? 'Hide Notes' : 'Take Notes'}
-          </Button>
-        </div>
+        )}
 
-        {/* Lesson Content */}
-        <div className="flex-1 overflow-y-auto">
-          <div className={`grid gap-6 ${showNotes ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
-            <div>{renderLessonContent()}</div>
-
-            {/* Notes Panel */}
-            {showNotes && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <StickyNote className="h-5 w-5" />
-                    Lesson Notes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Textarea
-                    placeholder="Take notes while learning..."
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    rows={20}
-                    className="font-mono text-sm"
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Notes are automatically saved
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
-
-        {/* Navigation Footer */}
-        <div className="flex items-center justify-between pt-4 mt-4 border-t">
-          <Button variant="outline" onClick={handlePreviousLesson} disabled={!hasPrevious}>
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Previous Lesson
-          </Button>
-
-          <div className="text-sm text-muted-foreground">
-            Lesson {currentLessonIndex + 1} of {allLessons.length}
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Chapter Header */}
+          <div className="flex items-start justify-between pb-4 mb-4 border-b">
+            <div className="flex-1">
+              {!showOutline && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowOutline(true)}
+                  className="mb-2"
+                >
+                  <List className="mr-2 h-4 w-4" />
+                  Show Outline
+                </Button>
+              )}
+              <div className="flex items-center gap-3 mb-2">
+                {selectedChapter && getLessonIcon(selectedChapter.type)}
+                <h1 className="text-2xl font-bold">{selectedChapter?.title}</h1>
+              </div>
+              {selectedChapter?.isCompleted && (
+                <Badge variant="success">
+                  <Check className="mr-1 h-3 w-3" />
+                  Completed
+                </Badge>
+              )}
+            </div>
+            <Button variant="outline" onClick={() => setShowNotes(!showNotes)}>
+              <StickyNote className="mr-2 h-4 w-4" />
+              {showNotes ? 'Hide Notes' : 'Take Notes'}
+            </Button>
           </div>
 
-          <Button
-            onClick={handleNextLesson}
-            disabled={!hasNext}
-            className="bg-brand-blue hover:bg-brand-blue/90"
-          >
-            Next Lesson
-            <ChevronRight className="ml-2 h-4 w-4" />
-          </Button>
+          {/* Chapter Content */}
+          <div className="flex-1 overflow-y-auto">
+            <div className={`grid gap-6 ${showNotes ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
+              <div>{renderChapterContent()}</div>
+
+              {/* Notes Panel */}
+              {showNotes && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <StickyNote className="h-5 w-5" />
+                      Chapter Notes
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      placeholder="Take notes while learning..."
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      rows={20}
+                      className="font-mono text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Notes are automatically saved locally
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation Footer */}
+          <div className="flex items-center justify-between pt-4 mt-4 border-t">
+            <Button variant="outline" onClick={handlePreviousChapter} disabled={!hasPrevious}>
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Previous Chapter
+            </Button>
+
+            <div className="text-sm text-muted-foreground">
+              Chapter {currentChapterIndex + 1} of {allChapters.length}
+            </div>
+
+            <Button
+              onClick={handleNextChapter}
+              disabled={!hasNext}
+              className="bg-brand-blue hover:bg-brand-blue/90"
+            >
+              Next Chapter
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

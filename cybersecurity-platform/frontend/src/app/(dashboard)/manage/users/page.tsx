@@ -1,5 +1,6 @@
 'use client';
 
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -235,6 +236,13 @@ export default function TenantUserManagementPage() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumbs
+        items={[
+          { label: 'Team Management', href: '/manage' },
+          { label: 'User Management', href: '/manage/users' },
+        ]}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

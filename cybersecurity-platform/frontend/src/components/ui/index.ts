@@ -10,3 +10,4 @@ export { Input } from './input';
 export type { InputProps } from './input';
 export { LoadingPage, LoadingSpinner } from './loading';
 export { Progress } from './progress';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';

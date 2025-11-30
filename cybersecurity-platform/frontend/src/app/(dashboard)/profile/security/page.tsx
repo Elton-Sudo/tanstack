@@ -1,5 +1,6 @@
 'use client';
 
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +9,13 @@ import { Key, Smartphone } from 'lucide-react';
 export default function SecuritySettingsPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <Breadcrumbs
+        items={[
+          { label: 'Profile', href: '/profile' },
+          { label: 'Security', href: '/profile/security' },
+        ]}
+      />
+
       <div>
         <h1 className="text-3xl font-bold">Security Settings</h1>
         <p className="text-muted-foreground">Manage your account security preferences</p>

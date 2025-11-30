@@ -1,5 +1,6 @@
 'use client';
 
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -134,6 +135,13 @@ export default function BrandingSettingsPage() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumbs
+        items={[
+          { label: 'Settings', href: '/settings' },
+          { label: 'Branding', href: '/settings/branding' },
+        ]}
+      />
+
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
