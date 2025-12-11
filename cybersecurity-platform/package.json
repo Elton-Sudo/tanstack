@@ -49,7 +49,9 @@
     "prisma:seed": "ts-node prisma/seed.ts",
     "docker:dev": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:clean": "docker-compose down -v"
+    "docker:clean": "docker-compose down -v",
+    "cleanup": "bash scripts/cleanup-ports.sh",
+    "prestart:all:dev": "npm run cleanup"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.478.0",
@@ -99,7 +101,7 @@
     "redis": "^4.6.12",
     "reflect-metadata": "^0.1.14",
     "rimraf": "^5.0.5",
-    "rxjs": "^7.8.1",
+    "rxjs": "^7.8.2",
     "sharp": "^0.33.1",
     "speakeasy": "^2.0.0",
     "twilio": "^4.20.0",

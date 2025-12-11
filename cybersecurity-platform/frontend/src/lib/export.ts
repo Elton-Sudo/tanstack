@@ -163,9 +163,9 @@ export const exportFormatters = {
     return date.toLocaleString();
   },
 
-  currency: (value: number, currency: string = 'USD') => {
+  currency: (value: number, currency: string = 'ZAR') => {
     if (value === null || value === undefined) return '';
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-ZA', {
       style: 'currency',
       currency,
     }).format(value);

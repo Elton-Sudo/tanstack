@@ -705,7 +705,7 @@ function SuperAdminDashboard() {
         />
         <MetricCard
           title="Monthly Revenue"
-          value={`$${(platformStats.monthlyRevenue / 1000).toFixed(1)}K`}
+          value={`R${(platformStats.monthlyRevenue / 1000).toFixed(1)}K`}
           subtitle="MRR this month"
           trend={{ value: 12.8, isPositive: true, label: 'vs last month' }}
           icon={DollarSign}
@@ -738,7 +738,7 @@ function SuperAdminDashboard() {
           description="Monthly recurring revenue"
           data={tenantGrowthData}
           xAxisKey="month"
-          dataKeys={[{ key: 'revenue', name: 'Revenue ($)', color: '#8CB841' }]}
+          dataKeys={[{ key: 'revenue', name: 'Revenue (ZAR)', color: '#8CB841' }]}
           height={300}
         />
       </div>
